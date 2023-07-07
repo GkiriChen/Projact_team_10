@@ -4,7 +4,7 @@ from prettytable import PrettyTable
 import os
 
 def input_text():
-    text = colored('Зробіть свій вибір: ', 'yellow')
+    text = colored('Зробіть свій вибір > ', 'yellow')
     return input(text).lower().split(' ')
 
 def show_greeting():      
