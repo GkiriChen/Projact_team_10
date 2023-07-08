@@ -47,6 +47,19 @@ class AddressBook(UserDict):
                         search_result.append(self.data[i])
                         break
         return print(search_result)
+    
+    def delete_contact(self, contact_name):
+        """
+        Deletes a contact record based on the provided contact_name.
+        If the contact is found and deleted, it returns "Contact deleted".
+        If the contact is not found, it returns "Contact not found".
+        """
+        contact_to_delete = self.data.get(contact_name)
+        if contact_to_delete:
+            del self.data[contact_name]
+            print ("Contact deleted")
+        else:
+            print ("Contact not found")
 
 
 class Field:
@@ -199,6 +212,11 @@ def search(args):
     return AddressBook.search_in(phone_book, args)
 
 @input_error
+def del_record(args):
+    global phone_book
+    return phone_book.delete_contact(args[0])
+
+@input_error
 def show():
     return print(next(phone_book.iterator()))
 
@@ -210,9 +228,9 @@ def main():
         global phone_book
         phone_book = AddressBook()
 
-    commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del']
+    commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact']
     while True:
-        b = input('Enter command:')
+        b = input('Enter command > ')
         c = ['good bye', 'close', 'exit']
         d, *args = b.split(' ')
         if b in c:
@@ -239,6 +257,8 @@ def main():
             del_phone(args)
         elif d == 'search':
             search(args)
+        elif d == 'del_contact':
+            del_record(args)
         else:
             print('Please enter correct command. Use command "help" to see more.')
 
