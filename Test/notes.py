@@ -2,6 +2,9 @@ from collections import UserDict
 from datetime import datetime
 import pickle
 import time
+from faker import Faker
+import random
+
 
 class Notes(UserDict):
     filename = 'notes.sav'
@@ -72,3 +75,45 @@ class Note:
 
     def del_tag(self, tag):
         self.tags.remove(tag)
+
+
+def fake_notes(notes):
+    fake = Faker(('uk_UA'))
+    notes.add_note('Заметка о том, что нужно не забыть делать заметки, чтобы ничего не забывать :-)')
+    time.sleep(0.1)
+    for _ in range(10):
+        i = random.randint(45, 210)
+        n.add_note(fake.text(i))
+        time.sleep(0.1)
+
+
+def main():
+    PROMPT = '>'    #приглашение командной строки
+
+    notes = Notes()
+    fake_notes()
+    # print(n.show_notes()) #раскоментировать для просмотра созданных фейковых заметок
+
+    while True:
+        answer = input(PROMPT)
+        if answer == 'add':     #добавление заметки
+            note = input("Tape your note " + PROMPT)
+            notes.add_note(note)
+            print("-- Your note added --")
+        elif answer == "show":  #вывод всех заметок
+            print(notes.show_notes())
+        elif answer == "find":  #поиск по заметкам
+            string = input("What find " + PROMPT)
+            res = notes.find_in_notes(string)
+            if not len(res):
+                print("-- No matches found --")
+            else:
+                print(notes.show_notes(res))
+        elif answer in ["exit", ""]:    #выход из цикла
+            print("Good bay!")
+            break    
+    pass
+
+
+if __name__ == "__main__":
+    main()
