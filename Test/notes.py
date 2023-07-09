@@ -83,7 +83,7 @@ def fake_notes(notes):
     time.sleep(0.1)
     for _ in range(10):
         i = random.randint(45, 210)
-        n.add_note(fake.text(i))
+        notes.add_note(fake.text(i))
         time.sleep(0.1)
 
 
@@ -91,7 +91,7 @@ def main():
     PROMPT = '>'    #приглашение командной строки
 
     notes = Notes()
-    fake_notes()
+    fake_notes(notes)
     # print(n.show_notes()) #раскоментировать для просмотра созданных фейковых заметок
 
     while True:
