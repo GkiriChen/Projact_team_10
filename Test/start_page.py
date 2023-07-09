@@ -2,6 +2,7 @@
 from termcolor import colored, cprint
 from prettytable import PrettyTable
 import os
+import Phone_Book 
 
 def input_text():
     text = colored('Зробіть свій вибір > ', 'yellow')
@@ -51,9 +52,9 @@ def run():
             os.system('cls||clear')  # чистим консоль
         
         if addresbook:
-            #  тут буде виклик логіки роботи з контактами
+            Phone_Book.main()
             addresbook = False
-        
+            os.system('cls||clear')  # чистим консоль
         if notes:
             #  тут буде виклик логіки роботи з нотатками            
             notes = False
