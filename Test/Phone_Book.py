@@ -2,6 +2,8 @@ from collections import UserDict, UserList
 from datetime import date, datetime
 import pickle
 import re
+from prettytable import PrettyTable
+from termcolor import colored
 class AddressBook(UserDict):
     def __init__(self, data={}):
         self.data = data
@@ -172,6 +174,14 @@ class Record:
                 self.phones.remove(phone)
                 return True
 
+    def change_birthday(self, birthday: Birthday):
+        self.birthday = birthday
+        return True
+    
+    def change_email_iner(self, email: Email):
+        self.email = email
+        return True
+    
     def delete_phone(self, new_phone):
         for phone in self.phones:
             if phone == new_phone:
@@ -192,6 +202,15 @@ class Record:
 
 file_name = 'Address_Book.bin'
 
+def show_greeting():      
+    x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+
+    x.field_names = [colored("Робота з адресною книгою, наразі доступні наступні команди:", 'light_blue')]
+    for a, i in enumerate(commands, start=1):
+        x.add_row([colored(f"{a}. {i}","blue")])
+
+    return x # показуємо табличку
+
 def pack_data():
     with open(file_name, "wb") as f:
         pickle.dump(phone_book, f)
@@ -209,64 +228,69 @@ def input_error(func):
         except KeyError:
             print('Enter user name.')
         except ValueError:
-            print('Incorrect data in input. Args should be in next raw: Name Phone Birthday E-mail. if you want to skip argument you can use "."')
+            print('Incorrect data in input.')
         except IndexError:
             print('You entered not correct number of args')
         except TypeError:
-            print(TypeError, 'Use commands')
+            print('Use commands')
         except StopIteration:
             print('This was last contact')
     return inner
 
 @input_error
-def add_contact(args):   
+def add_contact(args):
+    if args is str:
+        record = Record(Name(args))
+        phone_book.add_record(record)
+        return f'New contact was added: {record}'
     record = phone_book.data.get(args[0])
-    # print(phone_book.data.get(args[0]))
     if record is None:
-        if len(args) == 4:
-            record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
-            phone_book.add_record(record)
-        else:
-            print('Please enter all arguments (Name, Phone, Birthday, Email). If not any argument is not needed you can skip it using "."')
+        if len(args) != 4:
+            return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
+        record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
+        phone_book.add_record(record)
         # elif len(args) == 3:
         #     record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
         # elif len(args) == 2:
         #     record = Record(Name(args[0]), Phone(args[1]))
-        # elif len(args) == 1:
-        #     record = Record(Name(args[0]))
-        
-        print(f'A new contact: {args[0]}, has been added.')
+
+
+        return f'A new contact: {args[0]}, has been added.'
     else:
         record.add_phone(Phone(args[1]))
-        print('Added one more phone number')
+        return 'Added one more phone number'
 
 @input_error     
 def change_contact(args):  
     record = phone_book.data.get(args[0]) 
-    print(record)
     if args[0] not in phone_book.keys():  
         record.add_phone(args)  
-        print(f'{args[0]} added to contacts!')     
+        return f'{args[0]} added to contacts!'
     else:          
         for key in phone_book.keys():            
             if key == args[0]:
                 record.change_phone(args[1], args[2])
-                print(f'{key} changed his number!')   
+                return f'{key} changed his number!'
 
-# @input_error 
-# def change_email(self, email: Email):
-#     self.email = email
-#     return (f'Email was changed to {self.email}')
+@input_error 
+def change_email(args):
+    if args[0] not in phone_book.keys():
+        return f'{args[0]} is not in contacts!'
+    record = phone_book.data.get(args[0])
+    for key in phone_book.keys():            
+        if key == args[0]:
+            record.change_email_iner(Email(args[1]))
+            return (f'Email was changed in Contact > {record}')
 
-# @input_error 
-# def change_birthday(args):
-#     if args[0] not in phone_book.keys():    
-#         print(f'{args[0]} is not in contacts!')
-#     else:
-#         for key in phone_book.keys():            
-#             if key == args[0]:
-#             record.change_birthday = args[1]
-#         return (f'BD was changed to {self.birthday}')
+@input_error
+def change_birthday(args): 
+    if args[0] not in phone_book.keys():
+        return f'{args[0]} is not in contacts!'
+    record = phone_book.data.get(args[0])
+    for key in phone_book.keys():            
+        if key == args[0]:
+            record.change_birthday(Birthday(args[1]))
+            return (f'BD was changed in Contact > {record}')
 
 @input_error
 def del_phone(args):
@@ -287,7 +311,7 @@ def del_record(args):
 @input_error
 def show():
     return print(next(phone_book.iterator()))
-
+commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del_phone', 'del_contact', 'change_email', 'change_bd']
 @input_error
 def main():
     try:
@@ -296,9 +320,10 @@ def main():
         global phone_book
         phone_book = AddressBook()
 
-    commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact', 'change_email', 'change_bd']
+    # commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact', 'change_email', 'change_bd']
+    print(show_greeting())
     while True:
-        b = input('Enter command > ')
+        b = input(colored('Зробіть свій вибір > ', 'yellow'))
         c = ['good bye', 'close', 'exit']
         d, *args = b.split(' ')
         if b in c:
@@ -316,16 +341,16 @@ def main():
         elif b in commands:
             print('Enter arguments to command')
         elif d == 'add':
-            add_contact(args)
+            print(add_contact(args))
         elif d == 'change':
-            change_contact(args)
+            print(change_contact(args))
         elif d == 'change_email':
-            change_email(args)
+            print(change_email(args))
         elif d == 'change_bd':
-            change_contact(args)
+            print(change_birthday(args))
         elif d == 'phones':
             phone_book.show_phones(args)
-        elif d == 'del':
+        elif d == 'del_phone':
             del_phone(args)
         elif d == 'search':
             search(args)
