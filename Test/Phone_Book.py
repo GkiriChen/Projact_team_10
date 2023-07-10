@@ -337,11 +337,11 @@ def main():
                 for a, i in enumerate(commands, start=1):
                     if a == int(d):
                         d = i
-        if b in c:
+        if b in c or d in c:
             pack_data()
             print('See you soon!')
             break
-        elif b == 'show all': #or d == 'show all':
+        elif b == 'show all' or d == 'show all':
             print(phone_book.show_all_cont())
         elif b == 'hello' or d == 'hello':
             print('How can i help you?')
