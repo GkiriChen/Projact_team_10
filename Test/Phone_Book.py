@@ -13,7 +13,7 @@ class IntentCompleter(Completer):
         super().__init__()
         self.intents = commands
 
-    def get_completions(self, document):
+    def get_completions(self, document, complete_event):
         text_before_cursor = document.text_before_cursor
         word_before_cursor = text_before_cursor.split()[-1] if text_before_cursor else ''
 
@@ -121,7 +121,7 @@ class AddressBook(UserDict):
                 else:
                     session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
                     new_value = session2.prompt(f'Введіть нове значення для поля {input} > ')                    
-
+                    
                     if input in new_dict:
                         new_dict[input] = new_value
                         print(new_dict)
@@ -169,7 +169,7 @@ class Birthday(Field):
 
     @value.setter
     def value(self, new_value):
-        if new_value:
+       if new_value: 
             self.__value = datetime.strptime(new_value, '%d/%m/%Y').date()
 
 

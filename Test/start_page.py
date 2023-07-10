@@ -46,24 +46,20 @@ def run():
             except ValueError as e:
                 cprint('Введіть будь ласка число від 0 до 3', 'red')
 
-        if sorting:  #  тут виклик логіки роботи з сортувальником
-            
-            os.system('cls||clear')  # чистим консоль
+        if sorting:  #  тут виклик логіки роботи з сортувальником        
             clean.main()
             sorting = False
+            # os.system('cls||clear')  # чистим консоль
         
         if addresbook:  #  тут виклик логіки роботи з Phone_Book 
-            
-            os.system('cls||clear')  # чистим консоль
             Phone_Book.main()
             addresbook = False
-            
-        if notes_local: #  тут виклик логіки роботи з нотатками 
-            
             os.system('cls||clear')  # чистим консоль
+            
+        if notes_local: #  тут виклик логіки роботи з нотатками             
             notes.run()          
             notes_local = False
-            
+            os.system('cls||clear')  # чистим консоль
 
 if __name__ == '__main__':
     run()
