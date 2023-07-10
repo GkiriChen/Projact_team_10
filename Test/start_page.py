@@ -29,7 +29,7 @@ def run():
     
     while True:
         
-        if not (sorting or addresbook or notes):
+        if not (sorting or addresbook or notes_local):
             show_greeting()        
             answer = input_text()
         
