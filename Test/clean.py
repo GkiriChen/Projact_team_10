@@ -35,7 +35,7 @@ def search(path):
                         file= os.path.join(name_dir, f)             
                         move_file(file, path) #виклик функції перенесення файлів         
                         ##move_file(fr'{name_dir}/{f}', path) #виклик функції перенесення файлів   
-    print('list_dir search', list_dir)      
+    #print('list_dir search', list_dir)      
     return path, list_dir
 
 #переміщення файлів до папок та перевод назви файлу у латиницю
@@ -62,7 +62,7 @@ def move_file(path_file, path):
             
             if suffile != 'archives':
                 folder = os.path.join(path, suffile, file)
-                print('folder ', folder)
+                #print('folder ', folder)
                 print('path_file ', path_file)
                 os.rename(path_file, folder)
             elif suffile == 'archives':
@@ -76,7 +76,7 @@ def move_file(path_file, path):
 
 #Перевірка наявності папок для работи скрипта у вибраній дерікторії
 def folder_project(path):
-    list_dir_work = os.listdir(path) #отимання переліку папок та файлів у вибраній папці
+    list_dir_work = os.listdir(path) #отримання переліку папок та файлів у вибраній папці
     list_dir_ = ['video', 'audio', 'documents', 'images', 'archives'] #перелік папок для работи скрипта(сервісні папки)
     
     for i in list_dir_work: #перебираємо отриманий перелік
@@ -92,7 +92,7 @@ def folder_project(path):
         folder = os.path.join(path, d)
         os.mkdir(folder)
         #os.mkdir(fr'{path}/{d}') #створюємо папку
-    print('перевірив')
+    #print('перевірив')
                 
 #Функція переводу з кирилиці у латиницю назв
 def normalize(name):    
@@ -117,7 +117,7 @@ def del_empty_dir(list_dir=[]):
         delimiter = '/'
     else:
         delimiter = '\\'
-    print('delimiter', delimiter)
+   # print('delimiter', delimiter)
 
     for dir in sorted(list_dir, key=lambda x: len(x.split(delimiter)), reverse=True):    
         
@@ -136,13 +136,17 @@ def del_empty_dir(list_dir=[]):
 def main():
 
     try :        
-        print(os.name)
-        folder_project(sys.argv[1])
+        #print(os.name)
+        folder = input("Вветідть шлях до потрібнох папки > ")
+        ##folder_project(sys.argv[1])
+        folder_project(folder.strip())
         #search(sys.argv[1])
-        del_empty_dir(search(sys.argv[1])[1])    
-    except IndexError as er:
+        ##del_empty_dir(search(sys.argv[1])[1])    
+        del_empty_dir(search(folder.strip())[1])
+        print("Сортування завершено")
+    except Exception as er:
         print(er)
-        print('Ну і де посилання на дерікторію ?')
+        print('Ну і де шлях на папки?')
 
 if __name__ == '__main__':
     main()
