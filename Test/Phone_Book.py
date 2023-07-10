@@ -2,6 +2,25 @@ from collections import UserDict, UserList
 from datetime import date, datetime
 import pickle
 
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import Completer, Completion
+
+
+class IntentCompleter(Completer):
+    def __init__(self, commands):
+        super().__init__()
+        self.intents = commands
+
+    def get_completions(self, document, complete_event):
+        text_before_cursor = document.text_before_cursor
+        word_before_cursor = text_before_cursor.split()[-1] if text_before_cursor else ''
+
+        for intent in self.intents:
+            if intent.startswith(word_before_cursor):
+                yield Completion(intent, start_position=-len(word_before_cursor))
+
+
 class AddressBook(UserDict):
     def __init__(self, data={}):
         self.data = data
@@ -229,8 +248,11 @@ def main():
         phone_book = AddressBook()
 
     commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact']
+    session = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter(commands))
+   
     while True:
-        b = input('Enter command > ')
+        
+        b = session.prompt('> ')
         c = ['good bye', 'close', 'exit']
         d, *args = b.split(' ')
         if b in c:
