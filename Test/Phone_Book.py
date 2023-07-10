@@ -1,9 +1,10 @@
+import contextlib
 from collections import UserDict, UserList
 from datetime import date, datetime
 import pickle
 import re
 from prettytable import PrettyTable
-from termcolor import colored
+from termcolor import colored, cprint
 class AddressBook(UserDict):
     def __init__(self, data={}):
         self.data = data
@@ -63,7 +64,12 @@ class AddressBook(UserDict):
         else:
             print ("Contact not found")
 
-
+    def show_all_cont(self):
+        x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
+        for key, values in self.data.items():
+            x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+        return x
 class Field:
     def __init__(self, value):
         self.value = value
@@ -326,28 +332,33 @@ def main():
         b = input(colored('Зробіть свій вибір > ', 'yellow'))
         c = ['good bye', 'close', 'exit']
         d, *args = b.split(' ')
+        with contextlib.suppress(ValueError):
+            if int(d):
+                for a, i in enumerate(commands, start=1):
+                    if a == int(d):
+                        d = i
         if b in c:
             pack_data()
             print('See you soon!')
             break
-        elif b == 'show all':
-            print(phone_book)
-        elif b == 'hello':
+        elif b == 'show all': #or d == 'show all':
+            print(phone_book.show_all_cont())
+        elif b == 'hello' or d == 'hello':
             print('How can i help you?')
-        elif b == 'help':
-            print(commands)
-        elif b == 'next':
+        elif b == 'help' or d == 'help':
+            print(show_greeting())
+        elif b == 'next' or d == 'next':
             show()
         elif b in commands:
-            print('Enter arguments to command')
+            cprint('Enter arguments to command', 'red')
         elif d == 'add':
-            print(add_contact(args))
+            cprint(add_contact(args), 'blue')
         elif d == 'change':
-            print(change_contact(args))
+            cprint(change_contact(args), 'green')
         elif d == 'change_email':
-            print(change_email(args))
+            cprint(change_email(args), 'green')
         elif d == 'change_bd':
-            print(change_birthday(args))
+            cprint(change_birthday(args), 'green')
         elif d == 'phones':
             phone_book.show_phones(args)
         elif d == 'del_phone':
