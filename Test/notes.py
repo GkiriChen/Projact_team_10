@@ -4,6 +4,7 @@ import pickle
 import time
 from faker import Faker
 import random
+import os.path
 
 
 class Notes(UserDict):
@@ -91,7 +92,10 @@ def main():
     PROMPT = '>'    #приглашение командной строки
 
     notes = Notes()
-    fake_notes(notes)
+    if not os.path.exists(notes.filename):
+        fake_notes(notes)
+    else:
+        notes = notes.read_from_file()
     # print(n.show_notes()) #раскоментировать для просмотра созданных фейковых заметок
 
     while True:
@@ -99,6 +103,7 @@ def main():
         if answer == 'add':     #добавление заметки
             note = input("Tape your note " + PROMPT)
             notes.add_note(note)
+            notes.save_to_file()
             print("-- Your note added --")
         elif answer == "show":  #вывод всех заметок
             print(notes.show_notes())
@@ -110,6 +115,7 @@ def main():
             else:
                 print(notes.show_notes(res))
         elif answer in ["exit", ""]:    #выход из цикла
+            notes.save_to_file()
             print("Good bay!")
             break    
     pass
