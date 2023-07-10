@@ -47,9 +47,10 @@ def run():
                 cprint('Введіть будь ласка число від 0 до 3', 'red')
 
         if sorting:  #  тут виклик логіки роботи з сортувальником
+        
             clean.main()
             sorting = False
-            os.system('cls||clear')  # чистим консоль
+            # os.system('cls||clear')  # чистим консоль
         
         if addresbook:  #  тут виклик логіки роботи з Phone_Book 
             Phone_Book.main()
