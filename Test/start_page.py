@@ -57,7 +57,7 @@ def run():
             os.system('cls||clear')  # чистим консоль
             
         if notes_local: #  тут виклик логіки роботи з нотатками             
-            notes.run()          
+            notes.main()          
             notes_local = False
             os.system('cls||clear')  # чистим консоль
 
