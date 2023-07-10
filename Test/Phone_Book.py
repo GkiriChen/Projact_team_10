@@ -123,10 +123,10 @@ class AddressBook(UserDict):
                     new_value = session2.prompt(f'Введіть нове значення для поля {input} > ')                    
                     
                     if input in new_dict:
-                        if input == 'birthday':
-                           new_dict[input] = Birthday(new_value) 
-                        else:
-                           new_dict[input] = new_value
+                        # if input == 'birthday':
+                        #    new_dict[input] = Birthday(new_value) 
+                        # else:
+                        new_dict[input] = new_value
                         
                     else:                    
                         cprint ('Не знайдено або невірна команда', 'red')
