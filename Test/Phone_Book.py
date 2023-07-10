@@ -1,7 +1,7 @@
 from collections import UserDict, UserList
 from datetime import date, datetime
 import pickle
-
+import re
 class AddressBook(UserDict):
     def __init__(self, data={}):
         self.data = data
@@ -39,7 +39,7 @@ class AddressBook(UserDict):
     def search_in(self, args):
         search_result = []
         for i in self.data:
-            if args[0] in str(self.data[i].name):
+            if args[0] in str(self.data[i].name) or args[0] in str(self.data[i]):
                 search_result.append(self.data[i])
             else:
                 for j in list(self.data[i].phones):
@@ -86,9 +86,32 @@ class Name(Field):
 
 
 class Phone(Field):
-    pass
+    # pass
+    @property
+    def value(self):
+        return self.__value
+    
+    @value.setter
+    def value(self, value: str):
+        if value == '.':
+            self.__value = None
+        elif value[0] == '-':
+            self.__value = value[1:]
+        elif  len(value) < 9 or len(value) >= 12:
+            print(f"Invalid phone: {value}, phone number should consists 10-12 digits. If you wish to save any text as phone use '-' before number")
+            raise ValueError()
+        else:
+            self.__value = value  
 
 
+# class Birthday(Field):
+#     @property
+#     def value(self):
+#         return self.__value
+
+#     @value.setter
+#     def value(self, new_value):
+#         self.__value = datetime.strptime(new_value, '%d/%m/%Y').date()
 class Birthday(Field):
     @property
     def value(self):
@@ -96,25 +119,50 @@ class Birthday(Field):
 
     @value.setter
     def value(self, new_value):
-        self.__value = datetime.strptime(new_value, '%d/%m/%Y').date()
+        if new_value == '.':
+            self.__value = None
+        else:
+            try:
+                self.__value = datetime.strptime(new_value, '%d/%m/%Y').date()
+        
+            except (ValueError):
+                print("Invalid data. Enter date in format DD/MM/YYYY")
+                raise ValueError("Invalid data. Enter date in format dd/mm/YYYY")
 
+class Email(Field):
+    @property
+    def value(self):
+        return self.__value
+    
+    @value.setter
+    def value(self, value: str):
+        if value == '.':
+            self.__value = None
+        elif not re.match(r"[a-zA-Z]{1}[\w\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}", value):
+            print(f"Invalid email format: {value}. Email format should be name@domain.com")
+            raise ValueError()
+        else:
+            self.__value = value
 
 class Record:
-    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None):
+    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None):
         self.name = name
         self.phones = []
         self.birthday = ''
-        if phone:
+        self.email = ''
+        if phone and phone != '.':
             self.phones.append(phone)
-        if birthday:
+        if birthday and birthday != '.':
             self.birthday = birthday
+        if email and email != '.':
+            self.email = email
     def __str__(self):
-        return f' Phone numbers: {self.phones} BD: {self.birthday} Days to BD: {self.days_to_birthday()}'
+        return f'Name: {self.name} Phone numbers: {self.phones} email: {self.email} BD: {self.birthday}'
 
     def __repr__(self):
-        return f' Phone numbers:{self.phones} BD:{self.birthday} Days to BD:{self.days_to_birthday()}'
+        return f'Name: {self.name} Phone numbers:{self.phones} email: {self.email} BD:{self.birthday}'
 
-    def add_phone(self, phone):
+    def add_phone(self, phone: Phone):
         self.phones.append(phone)
 
     def change_phone(self, old_phone, new_phone):
@@ -161,11 +209,11 @@ def input_error(func):
         except KeyError:
             print('Enter user name.')
         except ValueError:
-            print('Incorrect data in input. Check the phone number(should be digit) and Birthday (in dd/mm/Y)!')
+            print('Incorrect data in input. Args should be in next raw: Name Phone Birthday E-mail. if you want to skip argument you can use "."')
         except IndexError:
             print('You entered not correct number of args')
         except TypeError:
-            print('Use commands')
+            print(TypeError, 'Use commands')
         except StopIteration:
             print('This was last contact')
     return inner
@@ -173,18 +221,23 @@ def input_error(func):
 @input_error
 def add_contact(args):   
     record = phone_book.data.get(args[0])
-    print(phone_book.data.get(args[0]))
+    # print(phone_book.data.get(args[0]))
     if record is None:
-        if len(args) > 2:
-            record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
-        elif len(args) == 2:
-            record = Record(Name(args[0]), Phone(args[1]))
-        elif len(args) == 1:
-            record = Record(Name(args[0]))
-        phone_book.add_record(record)
+        if len(args) == 4:
+            record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
+            phone_book.add_record(record)
+        else:
+            print('Please enter all arguments (Name, Phone, Birthday, Email). If not any argument is not needed you can skip it using "."')
+        # elif len(args) == 3:
+        #     record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
+        # elif len(args) == 2:
+        #     record = Record(Name(args[0]), Phone(args[1]))
+        # elif len(args) == 1:
+        #     record = Record(Name(args[0]))
+        
         print(f'A new contact: {args[0]}, has been added.')
     else:
-        record.add_phone(args[1])
+        record.add_phone(Phone(args[1]))
         print('Added one more phone number')
 
 @input_error     
@@ -199,6 +252,21 @@ def change_contact(args):
             if key == args[0]:
                 record.change_phone(args[1], args[2])
                 print(f'{key} changed his number!')   
+
+# @input_error 
+# def change_email(self, email: Email):
+#     self.email = email
+#     return (f'Email was changed to {self.email}')
+
+# @input_error 
+# def change_birthday(args):
+#     if args[0] not in phone_book.keys():    
+#         print(f'{args[0]} is not in contacts!')
+#     else:
+#         for key in phone_book.keys():            
+#             if key == args[0]:
+#             record.change_birthday = args[1]
+#         return (f'BD was changed to {self.birthday}')
 
 @input_error
 def del_phone(args):
@@ -228,7 +296,7 @@ def main():
         global phone_book
         phone_book = AddressBook()
 
-    commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact']
+    commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact', 'change_email', 'change_bd']
     while True:
         b = input('Enter command > ')
         c = ['good bye', 'close', 'exit']
@@ -250,6 +318,10 @@ def main():
         elif d == 'add':
             add_contact(args)
         elif d == 'change':
+            change_contact(args)
+        elif d == 'change_email':
+            change_email(args)
+        elif d == 'change_bd':
             change_contact(args)
         elif d == 'phones':
             phone_book.show_phones(args)
