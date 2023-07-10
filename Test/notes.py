@@ -13,8 +13,18 @@ class Notes(UserDict):
     # notes = {}
 
     def add_note(self, note):
-        note = Note(note)
-        self.data[note.datetime] = note
+        id = self.new_id()
+        note = Note(note, id)
+        self.data[note.id] = note
+
+    def new_id(self):
+        if not self.data:
+            return 1
+        else:
+            id_list = list(self.data.keys())
+            id_list.sort()
+            id = id_list[-1:][0] + 1
+            return id
 
     def find_in_notes(self, string):
         res = {}
@@ -35,14 +45,14 @@ class Notes(UserDict):
     def show_notes(self, data = None):
         if not data:
             data = self.data
-        res = '-' * 30 + '\n'
+        res = '-' * self.MAX_STR_LEN + '\n'
         for k, v in data.items():
             t = v.text
             while len(t):
                 res += t[:self.MAX_STR_LEN] + '\n'
-                t = t[50:]
-            res += k.strftime("<%d-%m-%Y %H:%M>") + '\n'
-            res += '-' * 30 + '\n'
+                t = t[self.MAX_STR_LEN:]
+            res += v.datetime.strftime("<%d-%m-%Y %H:%M>") + ' ' * 25 + 'id: ' + str(k) + '\n'
+            res += '-' * self.MAX_STR_LEN + '\n'
         return res
 
     def iterator(self, step=5):
@@ -65,10 +75,11 @@ class Notes(UserDict):
 class Note:
     MAX_NOTE_LEN = 150   # max lenth of note
 
-    def __init__(self, note):
+    def __init__(self, note, id):
         self.text = note[:self.MAX_NOTE_LEN]
         self.tags = ()
         self.datetime = datetime.now()
+        self.id = id
 
     def add_tags(self, tags):
         self.tags.add(tags)
