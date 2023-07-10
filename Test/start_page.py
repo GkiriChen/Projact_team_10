@@ -1,7 +1,7 @@
 
 from termcolor import colored, cprint
 from prettytable import PrettyTable
-import os, Phone_Book, notes
+import os, Phone_Book, notes, clean
 
 
 def input_text():
@@ -47,7 +47,7 @@ def run():
                 cprint('Введіть будь ласка число від 0 до 3', 'red')
 
         if sorting:
-            #  тут буде виклик логіки сортування
+            clean.main()
             sorting = False
             os.system('cls||clear')  # чистим консоль
         
