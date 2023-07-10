@@ -58,6 +58,7 @@ def run():
         if notes:
             #  тут буде виклик логіки роботи з нотатками            
             notes = False
+            os.system('cls||clear')  # чистим консоль
 
 if __name__ == '__main__':
     run()
