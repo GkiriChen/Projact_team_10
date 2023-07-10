@@ -39,7 +39,7 @@ def search(path):
     return path, list_dir
 
 #переміщення файлів до папок та перевод назви файлу у латиницю
-def move_file(path_file, path):
+def move_file(path_file, path, count):
     #print(path_file)
     
     list_dir_ = ['video', 'audio', 'documents', 'images', 'archives'] #перелік папок для работи скрипта(сервісні папки)
