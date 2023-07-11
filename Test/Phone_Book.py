@@ -175,7 +175,7 @@ class AddressBook(UserDict):
         x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
         for key, values in self.data.items():
             # x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.show_email()}","blue"),colored(f"{values.show_birthday()}","blue")])
-            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"","blue"),colored(f"","blue")])
+            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.birthday}","blue"),colored(f"{values.email}","blue")])
         return x
     
 class Field:
@@ -223,7 +223,7 @@ class Phone(Field):
         return self._Field__value
 
     def __repr__(self):
-        return self._Field__value
+        return self.value
 
 # class Birthday(Field):
 #     @property
@@ -267,9 +267,9 @@ class Email(Field):
             self.__value = value
 
 class Record:
-    def __init__(self, name: Name, phone: Phone = [], birthday: Birthday = None, email: Email = None):
+    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None):
         self.name = name
-        self.phones = phone
+        self.phones = []
         self.birthday = birthday
         self.email = email
         if phone and phone != '.':
