@@ -72,14 +72,14 @@ class AddressBook(UserDict):
         else:
             print ("Contact not found")
 
-    def show_all_cont(self):
+    def show_all_cont(self): #add 77, 79
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue'),colored("Address", 'light_blue')]
         for key, values in self.data.items():
             x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue"),colored(f"{values.address}","blue")])
         return x
     
-    def birthday_in_days(self):
+    def birthday_in_days(self): #add 82-113
         for key, value in phone_book.data.items():
             value = str(value)
             start_index = value.find("]") + 1
@@ -199,7 +199,7 @@ class Address(Field):
     pass
 
 
-class Record:
+class Record:  #add 203, 208, 215-221
     def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None, address: Address = None):
         self.name = name
         self.phones = []
@@ -298,7 +298,7 @@ def input_error(func):
     return inner
 
 @input_error
-def add_contact(args):
+def add_contact(args): #add 309, 310
     if args is str:
         record = Record(Name(args))
         phone_book.add_record(record)
@@ -382,7 +382,7 @@ def del_record(args):
 def show():
     return print(next(phone_book.iterator()))
 commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'change_address', 'birthday_in_days']
-
+#add 384, 436, 437
 @input_error
 def main():
     try:
