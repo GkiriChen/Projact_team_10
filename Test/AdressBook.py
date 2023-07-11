@@ -215,10 +215,10 @@ class Record:
         if address and address != '.':
             self.address = address
     def __str__(self):
-        return f'{self.name}{self.phones}{self.birthday}{self.email}'
+        return f'{self.name}{self.phones}{self.birthday}{self.email}{self.address}'
 
     def __repr__(self):
-        return f'{self.name}{self.phones}{self.birthday}{self.email}'
+        return f'{self.name}{self.phones}{self.birthday}{self.email}{self.address}'
 
     def add_phone(self, phone: Phone):
         self.phones.append(phone)
