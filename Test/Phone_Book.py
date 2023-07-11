@@ -49,6 +49,12 @@ class AddressBook(UserDict):
                     if args[0] in str(j):
                         search_result.append(self.data[i])
                         break
+        # x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+        # x.field_names = [colored("Що вдалося знайти:", 'light_blue')]
+        # x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
+        # for key, values in search_result:
+        #     x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+        # return x
         return print(search_result)
     
     def delete_contact(self, contact_name):
@@ -105,7 +111,7 @@ class Phone(Field):
             self.__value = None
         elif value[0] == '-':
             self.__value = value[1:]
-        elif  len(value) < 9 or len(value) >= 12:
+        elif  len(value) < 9 or len(value) > 12:
             print(f"Invalid phone: {value}, phone number should consists 10-12 digits. If you wish to save any text as phone use '-' before number")
             raise ValueError()
         else:
@@ -208,13 +214,13 @@ class Record:
 
 file_name = 'Address_Book.bin'
 
-def show_greeting():      
+def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
 
     x.field_names = [colored("Робота з адресною книгою, наразі доступні наступні команди:", 'light_blue')]
     for a, i in enumerate(commands, start=1):
         x.add_row([colored(f"{a}. {i}","blue")])
-
+    x.add_row([colored("0. close, exit", "blue")])
     return x # показуємо табличку
 
 def pack_data():
@@ -317,7 +323,8 @@ def del_record(args):
 @input_error
 def show():
     return print(next(phone_book.iterator()))
-commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del_phone', 'del_contact', 'change_email', 'change_bd']
+commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd']
+
 @input_error
 def main():
     try:
@@ -327,7 +334,7 @@ def main():
         phone_book = AddressBook()
 
     # commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact', 'change_email', 'change_bd']
-    print(show_greeting())
+    print(show_help())
     while True:
         b = input(colored('Зробіть свій вибір > ', 'yellow'))
         c = ['good bye', 'close', 'exit']
@@ -337,9 +344,10 @@ def main():
                 for a, i in enumerate(commands, start=1):
                     if a == int(d):
                         d = i
-        if b in c or d in c:
+
+        if b in c or d in c or d == '0':
             pack_data()
-            print('See you soon!')
+            cprint('See you soon!','green')
             break
         elif b == 'show all' or d == 'show all':
             print(phone_book.show_all_cont())
