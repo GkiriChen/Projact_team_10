@@ -1,0 +1,8 @@
+Faker==18.13.0
+prettytable==3.8.0
+prompt-toolkit==3.0.39
+python-dateutil==2.8.2
+six==1.16.0
+termcolor==2.3.0
+transliterate==1.10.2
+wcwidth==0.2.6
