@@ -91,7 +91,7 @@ class AddressBook(UserDict):
             return 'Added one more phone number'
 
     def delete_contact(self, contact_name):
-        """
+        """     5555
         Deletes a contact record based on the provided contact_name.
         If the contact is found and deleted, it returns "Contact deleted".
         If the contact is not found, it returns "Contact not found".
@@ -128,17 +128,17 @@ class AddressBook(UserDict):
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_phone(input_phone[0], input_phone[1])
-                    if input == 'email':
+                    elif input == 'email':
                         text = f'Введіть новий email y форматі "first@domen.com" > '
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_email_iner(Email(input_phone[0]))
-                    if input == 'birthday':
+                    elif input == 'birthday':
                         text = f'Введіть дату народження у форматі "День/Місяць/Рік" > '
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_birthday_in(Birthday(input_phone[0]))
-                    if input == 'name':
+                    elif input == 'name':
                         cprint('Вибачте зміна імені не доступна', 'red')
 
             cprint ("Контакт успішно оновлено", 'green')
