@@ -138,6 +138,8 @@ class AddressBook(UserDict):
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_birthday_in(Birthday(input_phone[0]))
+                    if input == 'name':
+                        cprint('Вибачте зміна імені не доступна', 'red')
 
             cprint ("Контакт успішно оновлено", 'green')
         else:
