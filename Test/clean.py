@@ -9,6 +9,7 @@ def search(path):
     list_dir_ = ['video', 'audio', 'documents', 'images', 'archives'] #перелік папок для работи скрипта (сервісні папки)
     list_dir = [path]
     all_dir = os.walk(path)
+    count = 0
     for i in all_dir: #перебор папок           
         
         if i[0] == str(path):
@@ -16,13 +17,15 @@ def search(path):
             if list_name_file != []:
                 for f in list_name_file:  
                     file= os.path.join(path, f)             
-                    move_file(file, path) #виклик функції перенесення файлів                      
+                    count = move_file(file, path, count) #виклик функції перенесення файлів                      
         else:            
             name_dir = i[0] #путь назва вкладеної папки
             one_dir = os.path.basename(name_dir) # назва вкладеної папики
 
             if one_dir in list_dir_: # перевірка чи папка є сервісною для роботи
                 pass
+            elif str(name_dir).find('archives') != -1:
+                print(name_dir)
             else: # якщо ні то обробляємо
                 #print(name_dir ,path + normalize(name_dir.split(path)[1]))
                 os.rename(name_dir, path + normalize(name_dir.split(path)[1])) # переіменування папки в латиницю
@@ -33,10 +36,10 @@ def search(path):
                 if list_name_file != []:
                     for f in list_name_file:   
                         file= os.path.join(name_dir, f)             
-                        move_file(file, path) #виклик функції перенесення файлів         
+                        count = move_file(file, path, count) #виклик функції перенесення файлів         
                         ##move_file(fr'{name_dir}/{f}', path) #виклик функції перенесення файлів   
     #print('list_dir search', list_dir)      
-    return path, list_dir
+    return path, list_dir, count
 
 #переміщення файлів до папок та перевод назви файлу у латиницю
 def move_file(path_file, path, count):
@@ -65,14 +68,17 @@ def move_file(path_file, path, count):
                 #print('folder ', folder)
                 print('path_file ', path_file)
                 os.rename(path_file, folder)
+                count += 1
             elif suffile == 'archives':
                 file = file.split('.')[0]
                 folder = os.path.join(path,'archives', file)
                 shutil.unpack_archive(path_file, folder)                
+                print('path_file ', path_file)
                 os.remove(path_file)    
+                count += 1
             else:
                 print('Невідомий файл -->', fr'{path_file}') 
-        
+    return count    
 
 #Перевірка наявності папок для работи скрипта у вибраній дерікторії
 def folder_project(path):
@@ -141,8 +147,10 @@ def main():
         ##folder_project(sys.argv[1])
         folder_project(folder.strip())
         #search(sys.argv[1])
-        ##del_empty_dir(search(sys.argv[1])[1])    
-        del_empty_dir(search(folder.strip())[1])
+        ##del_empty_dir(search(sys.argv[1])[1]) 
+        f = search(folder.strip())
+        del_empty_dir(f[1])
+        print(f"Відсортовано {f[2]} файл(ов/ів)")
         print("Сортування завершено")
     except Exception as er:
         print(er)
