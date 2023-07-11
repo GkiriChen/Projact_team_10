@@ -5,6 +5,8 @@ import time
 from faker import Faker
 import random
 import os.path
+from prettytable import PrettyTable
+from termcolor import colored, cprint
 
 
 class Notes(UserDict):
@@ -103,6 +105,7 @@ class Note:
     def edit_note(self, new_text):
         self.text = new_text
 
+
 def fake_notes(notes):
     fake = Faker(('uk_UA'))
     notes.add_note('Заметка о том, что нужно не забыть делать заметки, чтобы ничего не забывать :-)')
@@ -113,6 +116,15 @@ def fake_notes(notes):
         time.sleep(0.1)
 
 
+def show_greeting():
+    commands = ['add', 'show', 'find', 'edit', 'tag', 'tagfind', 'exit']
+    x = PrettyTable(align='l') 
+    x.field_names = [colored("Доступні команди:", 'light_blue')]
+    for el in commands:
+        x.add_row([colored(el,"blue")])     
+    print(x) # показуємо табличку
+
+
 def main():
     PROMPT = '>'    #приглашение командной строки
 
@@ -121,7 +133,8 @@ def main():
         fake_notes(notes)
     else:
         notes = notes.read_from_file()
-    # print(n.show_notes()) #раскоментировать для просмотра созданных фейковых заметок
+
+    show_greeting()
 
     while True:
         answer = input(PROMPT)
@@ -160,7 +173,6 @@ def main():
                 print("-- No matches found --")
             else:
                 print(notes.show_notes(res))
-
         elif answer == "del":  #удаление заметки
             id = int(input("Enter note id " + PROMPT))
             notes.del_note(id)
