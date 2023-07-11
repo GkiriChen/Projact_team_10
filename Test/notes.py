@@ -43,8 +43,12 @@ class Notes(UserDict):
         if id in self.data.keys():
             self.data[id].add_note_tags(tags)
             
-    def find_by_tag(self):
-        pass
+    def find_by_tag(self, string):
+        res = {}
+        for k, v in self.data.items():
+            if string.lower() in v.tags:
+                res[k] = v
+        return res
 
     def show_notes(self, data = None):
         if not data:
@@ -149,6 +153,14 @@ def main():
             notes.add_tags(id, note)
             notes.save_to_file()
             print("-- Tags added --")
+        elif answer == "tagfind":
+            string = input("What tag find " + PROMPT)
+            res = notes.find_by_tag(string)
+            if not len(res):
+                print("-- No matches found --")
+            else:
+                print(notes.show_notes(res))
+
         elif answer == "del":  #удаление заметки
             id = int(input("Enter note id " + PROMPT))
             notes.del_note(id)
