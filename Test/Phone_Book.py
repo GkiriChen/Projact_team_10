@@ -348,5 +348,6 @@ def main():
         else:
             cprint('Please enter correct command. Use command "help" to see more.', 'red')
 
+
 if __name__ == "__main__":
     main()
