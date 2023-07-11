@@ -167,15 +167,17 @@ class AddressBook(UserDict):
         else:
             cprint ("Контакт не знайдено", 'red')
 
-    def show_all_cont(self):
-        return phone_book
-    
     # def show_all_cont(self):
-    #     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
-    #     x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
-    #     for key, values in self.data.items():
-    #         x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
-    #     return x
+    #     return phone_book
+    
+    def show_all_cont(self):
+        x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
+        for key, values in self.data.items():
+            # x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.show_email()}","blue"),colored(f"{values.show_birthday()}","blue")])
+            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"","blue"),colored(f"","blue")])
+        return x
+    
 class Field:
     def __init__(self, value):
         self.value = value
@@ -216,7 +218,12 @@ class Phone(Field):
             raise ValueError()
         else:
             self.__value = value  
+    
+    def __str__(self):
+        return self._Field__value
 
+    def __repr__(self):
+        return self._Field__value
 
 # class Birthday(Field):
 #     @property
@@ -260,11 +267,11 @@ class Email(Field):
             self.__value = value
 
 class Record:
-    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None):
+    def __init__(self, name: Name, phone: Phone = [], birthday: Birthday = None, email: Email = None):
         self.name = name
-        self.phones = []
-        self.birthday = ''
-        self.email = ''
+        self.phones = phone
+        self.birthday = birthday
+        self.email = email
         if phone and phone != '.':
             self.phones.append(phone)
         if birthday and birthday != '.':
@@ -280,6 +287,15 @@ class Record:
 
     def add_phone(self, phone: Phone):
         self.phones.append(phone)
+    
+    def show_phones(self):
+        return self.phones
+    
+    def show_birthday(self):
+        return self.birthday
+    
+    def show_email(self):
+        return self.email
 
     def change_phone(self, old_phone, new_phone):
         for phone in self.phones:
