@@ -5,6 +5,24 @@ import pickle
 import re
 from prettytable import PrettyTable
 from termcolor import colored, cprint
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import Completer, Completion
+
+class IntentCompleter(Completer):
+    def __init__(self, commands):
+        super().__init__()
+        self.intents = commands
+
+    def get_completions(self, document, complete_event):
+        text_before_cursor = document.text_before_cursor
+        word_before_cursor = text_before_cursor.split()[-1] if text_before_cursor else ''
+
+        for intent in self.intents:
+            if intent.startswith(word_before_cursor):
+                yield Completion(intent, start_position=-len(word_before_cursor))
+
+
 class AddressBook(UserDict):
     def __init__(self, data={}):
         self.data = data
@@ -56,7 +74,45 @@ class AddressBook(UserDict):
         #     x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
         # return x
         return print(search_result)
-    
+    # >>>>>
+    def add_contact(self, args):
+        if args is str:
+            record = Record(Name(args))
+            self.add_record(record)
+            return f'New contact was added: {record}'
+        record = self.data.get(args[0])
+        if record is None:
+            if len(args) != 4:
+                return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
+            record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
+            self.add_record(record)
+            # elif len(args) == 3:
+            #     record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
+            # elif len(args) == 2:
+            #     record = Record(Name(args[0]), Phone(args[1]))
+
+
+            return f'A new contact: {args[0]}, has been added.'
+        else:
+            record.add_phone(Phone(args[1]))
+            return 'Added one more phone number'
+
+    # def add_contact(self, args):        
+    #     record = self.data.get(args[0])
+    #     print(self.data.get(args[0]))
+    #     if record is None:
+    #         if len(args) > 2:
+    #             record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
+    #         elif len(args) == 2:
+    #             record = Record(Name(args[0]), Phone(args[1]))
+    #         elif len(args) == 1:
+    #             record = Record(Name(args[0]))
+    #         self.add_record(record)
+    #         cprint(f'A new contact: {args[0]}, has been added.', 'green')
+    #     else:
+    #         record.add_phone(args[1])
+    #         cprint('Added one more phone number', 'red')
+# >>>>
     def delete_contact(self, contact_name):
         """
         Deletes a contact record based on the provided contact_name.
@@ -66,16 +122,60 @@ class AddressBook(UserDict):
         contact_to_delete = self.data.get(contact_name)
         if contact_to_delete:
             del self.data[contact_name]
-            print ("Contact deleted")
+            cprint ("Контакт успішно видалений", 'green')
         else:
-            print ("Contact not found")
+            cprint ("Контакт не знайдено", 'red')
+
+    def edit_contact(self, contact_name):
+        """
+        Edit a contact.       
+        """
+        contact_to_change = self.data.get(contact_name)
+        if contact_to_change:
+            list_commands = ['done']
+            new_dict = contact_to_change.__dict__.copy()
+            cprint ("+---------------------+", 'blue')
+            cprint ("Доступні поля для зміни", 'blue')
+            for key, value  in contact_to_change.__dict__.items():
+                print(f'{key} - {value}')
+                list_commands.append(key)
+            cprint ("+---------------------+", 'blue')
+            session = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter(list_commands))
+            
+            while True:                
+                input = session.prompt('Введіть перші літери поля яке хочете змінити, або "done" щоб завершити редагування > ')
+                input = input.split(' ')[0].strip()
+                if input == 'done':
+                    break
+                else:
+                    session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
+                    new_value = session2.prompt(f'Введіть нове значення для поля {input} > ')                    
+                    
+                    if input in new_dict:
+                        # if input == 'birthday':
+                        #    new_dict[input] = Birthday(new_value) 
+                        # else:
+                        new_dict[input] = new_value
+                        
+                    else:                    
+                        cprint ('Не знайдено або невірна команда', 'red')
+            
+            phone_book.delete_contact(contact_name)
+            phone_book.add_contact(list(new_dict.values()))
+
+            cprint ("Контакт успішно оновлено", 'green')
+        else:
+            cprint ("Контакт не знайдено", 'red')
 
     def show_all_cont(self):
-        x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
-        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
-        for key, values in self.data.items():
-            x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
-        return x
+        return phone_book
+    
+    # def show_all_cont(self):
+    #     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+    #     x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
+    #     for key, values in self.data.items():
+    #         x.add_row([colored(f"{key}","blue"),colored(f"{values.phones}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+    #     return x
 class Field:
     def __init__(self, value):
         self.value = value
@@ -143,6 +243,7 @@ class Birthday(Field):
                 print("Invalid data. Enter date in format DD/MM/YYYY")
                 raise ValueError("Invalid data. Enter date in format dd/mm/YYYY")
 
+
 class Email(Field):
     @property
     def value(self):
@@ -171,10 +272,11 @@ class Record:
         if email and email != '.':
             self.email = email
     def __str__(self):
-        return f'Name: {self.name} Phone numbers: {self.phones} email: {self.email} BD: {self.birthday}'
+        return self.name, self.phones, self.email, self.birthday
 
     def __repr__(self):
-        return f'Name: {self.name} Phone numbers:{self.phones} email: {self.email} BD:{self.birthday}'
+        return self.name, self.phones, self.email, self.birthday
+        # return f'Name: {self.name} Phone numbers:{self.phones} email: {self.email} BD:{self.birthday}'
 
     def add_phone(self, phone: Phone):
         self.phones.append(phone)
@@ -213,6 +315,7 @@ class Record:
 
 
 file_name = 'Address_Book.bin'
+commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'help']
 
 def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
@@ -250,28 +353,35 @@ def input_error(func):
     return inner
 
 @input_error
-def add_contact(args):
-    if args is str:
-        record = Record(Name(args))
-        phone_book.add_record(record)
-        return f'New contact was added: {record}'
-    record = phone_book.data.get(args[0])
-    if record is None:
-        if len(args) != 4:
-            return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
-        record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
-        phone_book.add_record(record)
-        # elif len(args) == 3:
-        #     record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
-        # elif len(args) == 2:
-        #     record = Record(Name(args[0]), Phone(args[1]))
+# <<<<<<< HEAD
+# def add_contact(args):
+#     if args is str:
+#         record = Record(Name(args))
+#         phone_book.add_record(record)
+#         return f'New contact was added: {record}'
+#     record = phone_book.data.get(args[0])
+#     if record is None:
+#         if len(args) != 4:
+#             return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
+#         record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
+#         phone_book.add_record(record)
+#         # elif len(args) == 3:
+#         #     record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]))
+#         # elif len(args) == 2:
+#         #     record = Record(Name(args[0]), Phone(args[1]))
 
 
-        return f'A new contact: {args[0]}, has been added.'
-    else:
-        record.add_phone(Phone(args[1]))
-        return 'Added one more phone number'
+#         return f'A new contact: {args[0]}, has been added.'
+#     else:
+#         record.add_phone(Phone(args[1]))
+#         return 'Added one more phone number'
 
+# =======
+def add_contact(args):   
+    global phone_book
+    phone_book.add_contact(args) 
+    
+# >>>>>>> main
 @input_error     
 def change_contact(args):  
     record = phone_book.data.get(args[0]) 
@@ -315,15 +425,28 @@ def del_phone(args):
 def search(args):
     return AddressBook.search_in(phone_book, args)
 
+# def show_greeting():      
+#     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+
+#     x.field_names = [colored("Доступні команди:", 'light_blue')]
+#     for el in commands:
+#         x.add_row([colored(el,"blue")])     
+#     print(x) # показуємо табличку
+
 @input_error
 def del_record(args):
     global phone_book
     return phone_book.delete_contact(args[0])
 
 @input_error
+def edit_contact(args):
+    global phone_book
+    return phone_book.edit_contact(args[0])
+
+@input_error
 def show():
     return print(next(phone_book.iterator()))
-commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd']
+# commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd']
 
 @input_error
 def main():
@@ -333,10 +456,18 @@ def main():
         global phone_book
         phone_book = AddressBook()
 
+# <<<<<<< HEAD
     # commands = ['add', 'change', 'phones', 'hello', 'show all', 'next', 'good bye', 'close', 'exit', 'del', 'del_contact', 'change_email', 'change_bd']
     print(show_help())
+    # while True:
+    #     b = input(colored('Зробіть свій вибір > ', 'yellow'))
+# =======
+    session = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter(commands))
+    # show_greeting()
     while True:
-        b = input(colored('Зробіть свій вибір > ', 'yellow'))
+        
+        b = session.prompt('Введіть потрібну вам команду > ').strip() 
+# >>>>>>> main
         c = ['good bye', 'close', 'exit']
         d, *args = b.split(' ')
         with contextlib.suppress(ValueError):
@@ -349,12 +480,12 @@ def main():
             pack_data()
             cprint('See you soon!','green')
             break
-        elif b == 'show all' or d == 'show all':
+        elif b == 'show_all' or d == 'show_all':
             print(phone_book.show_all_cont())
         elif b == 'hello' or d == 'hello':
             print('How can i help you?')
         elif b == 'help' or d == 'help':
-            print(show_greeting())
+            print(show_help())
         elif b == 'next' or d == 'next':
             show()
         elif b in commands:
@@ -375,8 +506,10 @@ def main():
             search(args)
         elif d == 'del_contact':
             del_record(args)
+        elif d == 'edit_contact':
+            edit_contact(args)
         else:
-            print('Please enter correct command. Use command "help" to see more.')
+            cprint('Please enter correct command. Use command "help" to see more.', 'red')
 
 if __name__ == "__main__":
     main()
