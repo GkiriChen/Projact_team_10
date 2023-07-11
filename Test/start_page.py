@@ -1,8 +1,8 @@
 
 from termcolor import colored, cprint
 from prettytable import PrettyTable
-import os
-import Phone_Book 
+import os, Phone_Book, notes, clean
+
 
 def input_text():
     text = colored('Зробіть свій вибір > ', 'yellow')
@@ -25,11 +25,11 @@ def run():
     
     sorting = False
     addresbook = False
-    notes = False
+    notes_local = False
     
     while True:
         
-        if not (sorting or addresbook or notes):
+        if not (sorting or addresbook or notes_local):
             show_greeting()        
             answer = input_text()
         
@@ -42,22 +42,24 @@ def run():
                 if int(answer[0]) == 2:
                     addresbook = True
                 if int(answer[0]) == 3:
-                    notes = True
+                    notes_local = True
             except ValueError as e:
                 cprint('Введіть будь ласка число від 0 до 3', 'red')
 
-        if sorting:
-            #  тут буде виклик логіки сортування
+        if sorting:  #  тут виклик логіки роботи з сортувальником        
+            clean.main()
             sorting = False
-            os.system('cls||clear')  # чистим консоль
+            # os.system('cls||clear')  # чистим консоль
         
-        if addresbook:
+        if addresbook:  #  тут виклик логіки роботи з Phone_Book 
             Phone_Book.main()
             addresbook = False
             os.system('cls||clear')  # чистим консоль
-        if notes:
-            #  тут буде виклик логіки роботи з нотатками            
-            notes = False
+            
+        if notes_local: #  тут виклик логіки роботи з нотатками             
+            notes.main()          
+            notes_local = False
+            os.system('cls||clear')  # чистим консоль
 
 if __name__ == '__main__':
     run()
