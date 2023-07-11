@@ -324,7 +324,7 @@ class Record:
 
 
 file_name = 'Address_Book.bin'
-commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'help']
+commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'help', 'search']
 
 def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
