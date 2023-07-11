@@ -33,11 +33,11 @@ class Notes(UserDict):
                 res[k] = v
         return res
 
-    def edit_note(self):
-        pass
+    def edit_note(self, note, id):
+        self.data[id].edit_note(note)
 
-    def del_note(self):
-        pass
+    def del_note(self, id):
+        self.data.pop(id)
 
     def find_by_tag(self):
         pass
@@ -88,6 +88,8 @@ class Note:
     def del_tag(self, tag):
         self.tags.remove(tag)
 
+    def edit_note(self, new_text):
+        self.text = new_text
 
 def fake_notes(notes):
     fake = Faker(('uk_UA'))
@@ -125,6 +127,18 @@ def main():
                 print("-- No matches found --")
             else:
                 print(notes.show_notes(res))
+        elif answer == "edit":  #редактирование заметки
+            id = int(input("Enter note id " + PROMPT))
+            print(notes.show_notes({id: notes.data[id]}))
+            note = input("Edit note " + PROMPT)
+            notes.edit_note(note, id)
+            notes.save_to_file()
+            print("-- Note saved --")
+        elif answer == "del":  #удаление заметки
+            id = int(input("Enter note id " + PROMPT))
+            notes.del_note(id)
+            notes.save_to_file()
+            print("-- Note deleted --")
         elif answer in ["exit", ""]:    #выход из цикла
             notes.save_to_file()
             print("Good bay!")
