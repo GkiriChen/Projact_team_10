@@ -7,7 +7,7 @@ import os, Phone_Book, notes, clean
 def input_text():
     text = colored('Зробіть свій вибір > ', 'yellow')
     return input(text).lower().split(' ')
-
+    
 def show_greeting():      
      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
