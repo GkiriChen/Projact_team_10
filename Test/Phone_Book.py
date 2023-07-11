@@ -128,7 +128,7 @@ class AddressBook(UserDict):
 
     def edit_contact(self, contact_name):
         """
-        Edit a contact.       
+        Edit a contact.
         """
         contact_to_change = self.data.get(contact_name)
         if contact_to_change:
@@ -141,28 +141,18 @@ class AddressBook(UserDict):
                 list_commands.append(key)
             cprint ("+---------------------+", 'blue')
             session = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter(list_commands))
-            
-            while True:                
+            while True:
                 input = session.prompt('Введіть перші літери поля яке хочете змінити, або "done" щоб завершити редагування > ')
                 input = input.split(' ')[0].strip()
                 if input == 'done':
                     break
                 else:
                     session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
-                    new_value = session2.prompt(f'Введіть нове значення для поля {input} > ')                    
-                    
-                    if input in new_dict:
-                        # if input == 'birthday':
-                        #    new_dict[input] = Birthday(new_value) 
-                        # else:
-                        new_dict[input] = new_value
-                        
-                    else:                    
-                        cprint ('Не знайдено або невірна команда', 'red')
-            
-            phone_book.delete_contact(contact_name)
-            phone_book.add_contact(list(new_dict.values()))
-
+                    if input == 'phones':
+                        text = f'Введіть старий і новий номер > '
+                        new_value = session2.prompt(text)
+                        input_phone = new_value.split(' ')
+                        contact_to_change.change_phone(input_phone[0], input_phone[1])
             cprint ("Контакт успішно оновлено", 'green')
         else:
             cprint ("Контакт не знайдено", 'red')
@@ -174,17 +164,11 @@ class AddressBook(UserDict):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
         for key, values in self.data.items():
-            print(key, values.show_birthday(),values.show_email(),values.show_phones())
-            # try:
-            #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
-            # except AttributeError:
-            #     try:
-            #         x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
-            #     except AttributeError:
-            #         print('Err')
-            # x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.show_email()}","blue"),colored(f"{values.show_birthday()}","blue")])
+            # print(key, values.show_birthday(),values.show_email(),values.show_phones())
+            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+                        # x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.show_email()}","blue"),colored(f"{values.show_birthday()}","blue")])
             # x.add_row([colored(f"{key}","blue"),colored(f"","blue"),colored(f"","blue"),colored(f"","blue")])
-        # return values
+        return x
     
 class Field:
     def __init__(self, value):
@@ -308,7 +292,7 @@ class Record:
 
     def change_phone(self, old_phone, new_phone):
         for phone in self.phones:
-            if phone == old_phone:
+            if phone.value == old_phone:
                 self.add_phone(new_phone)
                 self.phones.remove(phone)
                 return True
@@ -506,7 +490,7 @@ def main():
             cprint('See you soon!','green')
             break
         elif b == 'show_all' or d == 'show_all':
-            cprint(phone_book.show_all_cont(), 'red')
+            print(phone_book.show_all_cont())
         elif b == 'hello' or d == 'hello':
             print('How can i help you?')
         elif b == 'help' or d == 'help':
