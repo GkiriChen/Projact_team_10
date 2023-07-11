@@ -59,7 +59,7 @@ class AddressBook(UserDict):
 
     def search_in(self, args):
         search_result = []
-        for i, j in self.data:
+        for i, j in self.data.items():
             if args[0] in str(self.data[i]):
                 search_result.append(self.data[i])
             else:
@@ -109,7 +109,6 @@ class AddressBook(UserDict):
         contact_to_change = self.data.get(contact_name)
         if contact_to_change:
             list_commands = ['done']
-            new_dict = contact_to_change.__dict__.copy()
             cprint ("+---------------------+", 'blue')
             cprint ("Доступні поля для зміни", 'blue')
             for key, value  in contact_to_change.__dict__.items():
@@ -125,10 +124,23 @@ class AddressBook(UserDict):
                 else:
                     session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
                     if input == 'phones':
-                        text = f'Введіть старий і новий номер > '
+                        text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_phone(input_phone[0], input_phone[1])
+                    if input == 'email':
+                        text = f'Введіть новий email y форматі "first@domen.com" > '
+                        new_value = session2.prompt(text)
+                        input_phone = new_value.split(' ')
+                        contact_to_change.change_email_iner(Email(input_phone[0]))
+                    if input == 'birthday':
+                        text = f'Введіть дату народження у форматі "День/Місяць/Рік" > '
+                        new_value = session2.prompt(text)
+                        input_phone = new_value.split(' ')
+                        contact_to_change.change_birthday_in(Birthday(input_phone[0]))
+                    if input == 'name':
+                        cprint('Вибачте зміна імені не доступна', 'red')
+
             cprint ("Контакт успішно оновлено", 'green')
         else:
             cprint ("Контакт не знайдено", 'red')
@@ -295,6 +307,7 @@ def pack_data():
     with open(file_name, "wb") as f:
         pickle.dump(phone_book, f)
 
+
 def unpack_data():
     with open(file_name, "rb") as f:
         unpacked = pickle.load(f)
@@ -435,6 +448,7 @@ def main():
             edit_contact(args)
         else:
             cprint('Please enter correct command. Use command "help" to see more.', 'red')
+
 
 if __name__ == "__main__":
     main()
