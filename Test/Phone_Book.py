@@ -32,13 +32,13 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    # def show_phones(self, args):
-    #     if args[0] in self.data.keys():
-    #         for i, j in self.data.items():
-    #             if args[0] == i:
-    #                 print(j.phones)
-    #     else:
-    #         print(f'No {args[0]} in Address_book')
+    def show_phones(self, args):
+        if args[0] in self.data.keys():
+            for i, j in self.data.items():
+                if args[0] == i:
+                    print(j.phones)
+        else:
+            print(f'No {args[0]} in Address_book')
 
     def iterator(self):
         if not self.__iterator:
@@ -89,14 +89,15 @@ class AddressBook(UserDict):
         else:
             record.add_phone(Phone(args[1]))
             return 'Added one more phone number'
-
+    
     def delete_contact(self, contact_name):
         """     5555
         Deletes a contact record based on the provided contact_name.
         If the contact is found and deleted, it returns "Contact deleted".
         If the contact is not found, it returns "Contact not found".
         """
-        if contact_to_delete := self.data.get(contact_name):
+        contact_to_delete = self.data.get(contact_name)
+        if contact_to_delete:
             del self.data[contact_name]
             return "Контакт успішно видалений"
         else:
