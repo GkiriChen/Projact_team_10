@@ -32,13 +32,13 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    def show_phones(self, args):
-        if args[0] in self.data.keys():
-            for i, j in self.data.items():
-                if args[0] == i:
-                    print(j.phones)
-        else:
-            print(f'No {args[0]} in Address_book')
+    # def show_phones(self, args):
+    #     if args[0] in self.data.keys():
+    #         for i, j in self.data.items():
+    #             if args[0] == i:
+    #                 print(j.phones)
+    #     else:
+    #         print(f'No {args[0]} in Address_book')
 
     def iterator(self):
         if not self.__iterator:
@@ -174,9 +174,17 @@ class AddressBook(UserDict):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
         for key, values in self.data.items():
+            print(key, values.show_birthday(),values.show_email(),values.show_phones())
+            # try:
+            #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+            # except AttributeError:
+            #     try:
+            #         x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+            #     except AttributeError:
+            #         print('Err')
             # x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.show_email()}","blue"),colored(f"{values.show_birthday()}","blue")])
-            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.birthday}","blue"),colored(f"{values.email}","blue")])
-        return x
+            # x.add_row([colored(f"{key}","blue"),colored(f"","blue"),colored(f"","blue"),colored(f"","blue")])
+        # return values
     
 class Field:
     def __init__(self, value):
@@ -220,11 +228,11 @@ class Phone(Field):
         else:
             self.__value = value  
     
-    def __str__(self):
-        return self._Field__value
+    # def __str__(self):
+    #     return self._Field__value
 
-    def __repr__(self):
-        return self.value
+    # def __repr__(self):
+    #     return self.value
 
 # class Birthday(Field):
 #     @property
@@ -271,8 +279,8 @@ class Record:
     def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None):
         self.name = name
         self.phones = []
-        self.birthday = birthday
-        self.email = email
+        self.birthday = None
+        self.email = None
         if phone and phone != '.':
             self.phones.append(phone)
         if birthday and birthday != '.':
@@ -498,7 +506,7 @@ def main():
             cprint('See you soon!','green')
             break
         elif b == 'show_all' or d == 'show_all':
-            print(phone_book.show_all_cont())
+            cprint(phone_book.show_all_cont(), 'red')
         elif b == 'hello' or d == 'hello':
             print('How can i help you?')
         elif b == 'help' or d == 'help':
