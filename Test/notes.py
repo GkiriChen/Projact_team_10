@@ -39,6 +39,10 @@ class Notes(UserDict):
     def del_note(self, id):
         self.data.pop(id)
 
+    def add_tags(self, id, tags):
+        if id in self.data.keys():
+            self.data[id].add_note_tags(tags)
+            
     def find_by_tag(self):
         pass
 
@@ -51,6 +55,8 @@ class Notes(UserDict):
             while len(t):
                 res += t[:self.MAX_STR_LEN] + '\n'
                 t = t[self.MAX_STR_LEN:]
+            if v.tags:
+                res += v.show_tags() + '\n'
             res += v.datetime.strftime("<%d-%m-%Y %H:%M>") + ' ' * 25 + 'id: ' + str(k) + '\n'
             res += '-' * self.MAX_STR_LEN + '\n'
         return res
@@ -77,16 +83,18 @@ class Note:
 
     def __init__(self, note, id):
         self.text = note[:self.MAX_NOTE_LEN]
-        self.tags = ()
+        self.tags = set()
         self.datetime = datetime.now()
         self.id = id
 
-    def add_tags(self, tags):
-        self.tags.add(tags)
-        pass
+    def add_note_tags(self, tags):
+        self.tags.update(tags.split())
 
     def del_tag(self, tag):
         self.tags.remove(tag)
+
+    def show_tags(self):
+        return '#' + ', #'.join(self.tags)
 
     def edit_note(self, new_text):
         self.text = new_text
@@ -134,6 +142,13 @@ def main():
             notes.edit_note(note, id)
             notes.save_to_file()
             print("-- Note saved --")
+        elif answer == "tag":  #добавление тегов в заметку
+            id = int(input("Enter note id " + PROMPT))
+            print(notes.show_notes({id: notes.data[id]}))
+            note = input("Add tags " + PROMPT)
+            notes.add_tags(id, note)
+            notes.save_to_file()
+            print("-- Tags added --")
         elif answer == "del":  #удаление заметки
             id = int(input("Enter note id " + PROMPT))
             notes.del_note(id)
