@@ -27,7 +27,7 @@ class IntentCompleter(Completer):
 
 
 class Notes(UserDict):
-    filename = 'notes.sav'
+    filename = 'Assistant/notes.sav'
     MAX_STR_LEN = 50
     # notes = {}
 
