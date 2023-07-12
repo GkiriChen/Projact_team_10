@@ -329,6 +329,7 @@ class Record:
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
         return f'Email was changed in Contact > {self.birthday}'
+        return f'Дата народження змінена'
     
     def change_email_iner(self, email: Email):
         self.email = email
@@ -394,6 +395,7 @@ def input_error(func):
             print('Enter user name.')
         except ValueError:
             print('Incorrect data in input.')
+            cprint('Некоректні данні', 'red')
         except IndexError:
             print('You entered not correct number of args')
             cprint('Введіть правильну кількість аргументів', 'red')
@@ -438,6 +440,7 @@ def change_contact(args):
 def change_email(args):
     if args[0] not in phone_book.keys():
         return f'{args[0]} is not in contacts!'
+        return f'{args[0]} Такого контакту неіснуе!'
     record = phone_book.data.get(args[0])
     for key in phone_book.keys():            
         if key == args[0]:
@@ -454,6 +457,7 @@ def change_birthday(args):
         if key == args[0]:
             record.change_birthday_in(Birthday(args[1]))
         return f'Birthday was changed in Contact > {record}'
+        return f'День народження змінено > {record}'
 
 @input_error
 def del_phone(args):
@@ -555,6 +559,7 @@ def main():
             print(phone_book.show_phones(args))
         elif d == 'del_phone':
             del_phone(args)
+            print(del_phone(args))
         elif d == 'search':
             search(args)
             print(search(args))
