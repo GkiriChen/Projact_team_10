@@ -4,6 +4,9 @@ import pickle
 import time
 from faker import Faker
 import random
+import os.path
+from prettytable import PrettyTable
+from termcolor import colored, cprint
 
 
 class Notes(UserDict):
@@ -12,8 +15,18 @@ class Notes(UserDict):
     # notes = {}
 
     def add_note(self, note):
-        note = Note(note)
-        self.data[note.datetime] = note
+        id = self.new_id()
+        note = Note(note, id)
+        self.data[note.id] = note
+
+    def new_id(self):
+        if not self.data:
+            return 1
+        else:
+            id_list = list(self.data.keys())
+            id_list.sort()
+            id = id_list[-1:][0] + 1
+            return id
 
     def find_in_notes(self, string):
         res = {}
@@ -22,26 +35,36 @@ class Notes(UserDict):
                 res[k] = v
         return res
 
-    def edit_note(self):
-        pass
+    def edit_note(self, note, id):
+        self.data[id].edit_note(note)
 
-    def del_note(self):
-        pass
+    def del_note(self, id):
+        self.data.pop(id)
 
-    def find_by_tag(self):
-        pass
+    def add_tags(self, id, tags):
+        if id in self.data.keys():
+            self.data[id].add_note_tags(tags)
+            
+    def find_by_tag(self, string):
+        res = {}
+        for k, v in self.data.items():
+            if string.lower() in v.tags:
+                res[k] = v
+        return res
 
     def show_notes(self, data = None):
         if not data:
             data = self.data
-        res = '-' * 30 + '\n'
+        res = '-' * self.MAX_STR_LEN + '\n'
         for k, v in data.items():
             t = v.text
             while len(t):
                 res += t[:self.MAX_STR_LEN] + '\n'
-                t = t[50:]
-            res += k.strftime("<%d-%m-%Y %H:%M>") + '\n'
-            res += '-' * 30 + '\n'
+                t = t[self.MAX_STR_LEN:]
+            if v.tags:
+                res += v.show_tags() + '\n'
+            res += v.datetime.strftime("<%d-%m-%Y %H:%M>") + ' ' * 25 + 'id: ' + str(k) + '\n'
+            res += '-' * self.MAX_STR_LEN + '\n'
         return res
 
     def iterator(self, step=5):
@@ -64,17 +87,23 @@ class Notes(UserDict):
 class Note:
     MAX_NOTE_LEN = 150   # max lenth of note
 
-    def __init__(self, note):
+    def __init__(self, note, id):
         self.text = note[:self.MAX_NOTE_LEN]
-        self.tags = ()
+        self.tags = set()
         self.datetime = datetime.now()
+        self.id = id
 
-    def add_tags(self, tags):
-        self.tags.add(tags)
-        pass
+    def add_note_tags(self, tags):
+        self.tags.update(tags.split())
 
     def del_tag(self, tag):
         self.tags.remove(tag)
+
+    def show_tags(self):
+        return '#' + ', #'.join(self.tags)
+
+    def edit_note(self, new_text):
+        self.text = new_text
 
 
 def fake_notes(notes):
@@ -87,18 +116,32 @@ def fake_notes(notes):
         time.sleep(0.1)
 
 
+def show_greeting():
+    commands = ['add', 'show', 'find', 'edit', 'tag', 'tagfind', 'exit']
+    x = PrettyTable(align='l') 
+    x.field_names = [colored("Доступні команди:", 'light_blue')]
+    for el in commands:
+        x.add_row([colored(el,"blue")])     
+    print(x) # показуємо табличку
+
+
 def main():
     PROMPT = '>'    #приглашение командной строки
 
     notes = Notes()
-    fake_notes(notes)
-    # print(n.show_notes()) #раскоментировать для просмотра созданных фейковых заметок
+    if not os.path.exists(notes.filename):
+        fake_notes(notes)
+    else:
+        notes = notes.read_from_file()
+
+    show_greeting()
 
     while True:
         answer = input(PROMPT)
         if answer == 'add':     #добавление заметки
             note = input("Tape your note " + PROMPT)
             notes.add_note(note)
+            notes.save_to_file()
             print("-- Your note added --")
         elif answer == "show":  #вывод всех заметок
             print(notes.show_notes())
@@ -109,7 +152,34 @@ def main():
                 print("-- No matches found --")
             else:
                 print(notes.show_notes(res))
+        elif answer == "edit":  #редактирование заметки
+            id = int(input("Enter note id " + PROMPT))
+            print(notes.show_notes({id: notes.data[id]}))
+            note = input("Edit note " + PROMPT)
+            notes.edit_note(note, id)
+            notes.save_to_file()
+            print("-- Note saved --")
+        elif answer == "tag":  #добавление тегов в заметку
+            id = int(input("Enter note id " + PROMPT))
+            print(notes.show_notes({id: notes.data[id]}))
+            note = input("Add tags " + PROMPT)
+            notes.add_tags(id, note)
+            notes.save_to_file()
+            print("-- Tags added --")
+        elif answer == "tagfind":
+            string = input("What tag find " + PROMPT)
+            res = notes.find_by_tag(string)
+            if not len(res):
+                print("-- No matches found --")
+            else:
+                print(notes.show_notes(res))
+        elif answer == "del":  #удаление заметки
+            id = int(input("Enter note id " + PROMPT))
+            notes.del_note(id)
+            notes.save_to_file()
+            print("-- Note deleted --")
         elif answer in ["exit", ""]:    #выход из цикла
+            notes.save_to_file()
             print("Good bay!")
             break    
     pass
