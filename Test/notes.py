@@ -7,6 +7,23 @@ import random
 import os.path
 from prettytable import PrettyTable
 from termcolor import colored, cprint
+from prompt_toolkit import PromptSession
+from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
+from prompt_toolkit.completion import Completer, Completion
+
+
+class IntentCompleter(Completer):
+    def __init__(self, commands):
+        super().__init__()
+        self.intents = commands
+
+    def get_completions(self, document, complete_event):
+        text_before_cursor = document.text_before_cursor
+        word_before_cursor = text_before_cursor.split()[-1] if text_before_cursor else ''
+
+        for intent in self.intents:
+            if intent.startswith(word_before_cursor):
+                yield Completion(intent, start_position=-len(word_before_cursor))
 
 
 class Notes(UserDict):
@@ -116,28 +133,30 @@ def fake_notes(notes):
         time.sleep(0.1)
 
 
-def show_greeting():
-    commands = ['add', 'show', 'find', 'edit', 'tag', 'tagfind', 'exit']
+def show_greeting(commands):
     x = PrettyTable(align='l') 
     x.field_names = [colored("Доступні команди:", 'light_blue')]
     for el in commands:
         x.add_row([colored(el,"blue")])     
-    print(x) # показуємо табличку
+    print(x)
 
 
 def main():
-    PROMPT = '>'    #приглашение командной строки
-
+    PROMPT = ' > '    #приглашение командной строки
+    commands = ['add', 'show', 'find', 'edit', 'tag', 'tagfind', 'exit']
+    session = PromptSession(auto_suggest=AutoSuggestFromHistory(), 
+                            completer=IntentCompleter(commands))
+    
     notes = Notes()
     if not os.path.exists(notes.filename):
         fake_notes(notes)
     else:
         notes = notes.read_from_file()
 
-    show_greeting()
+    show_greeting(commands)
 
     while True:
-        answer = input(PROMPT)
+        answer = session.prompt('Введіть команду' + PROMPT).strip()
         if answer == 'add':     #добавление заметки
             note = input("Tape your note " + PROMPT)
             notes.add_note(note)
@@ -166,7 +185,7 @@ def main():
             notes.add_tags(id, note)
             notes.save_to_file()
             print("-- Tags added --")
-        elif answer == "tagfind":
+        elif answer == "tagfind":   #поиск по тегу
             string = input("What tag find " + PROMPT)
             res = notes.find_by_tag(string)
             if not len(res):
