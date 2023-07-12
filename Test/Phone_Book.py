@@ -38,7 +38,7 @@ class AddressBook(UserDict):
                 if args[0] == i:
                     return f'Контакт: {args[0]} номери: {j.phones}'
         else:
-            return f'No {args[0]} in Address_book'
+            return f'Контакт {args[0]} відсутній'
 
     def iterator(self):
         if not self.__iterator:
@@ -68,7 +68,7 @@ class AddressBook(UserDict):
                         search_result.append(self.data[i])
                         break
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
-        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue'),colored("Address", 'light_blue')]
+        x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
         for values in search_result:
             x.add_row([colored(f"{values.name}","blue"),colored(f"{values.phones}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
@@ -151,43 +151,33 @@ class AddressBook(UserDict):
             cprint ("Контакт не знайдено", 'red')
     
     def birthday_in_days(self, args): #add 82-113
-        
-        for key, value in phone_book.data.items():
-            value = str(value)
-            start_index = value.find("]") + 1
-            end_index = value.find("]") + 11
-            birthday = value[start_index:end_index]
-            
-            try:
-                birthday = datetime.strptime(birthday, '%Y-%m-%d')
-            except ValueError:
-                continue
-
-            number = int(args[0])
-            today = date.today()
-            birthday_this_year = date(today.year, birthday.month, birthday.day)
-            birthday_next_year = date(today.year + 1, birthday.month, birthday.day)
-            
-            if birthday_this_year >= today:
-                delta = birthday_this_year - today
-                delta_plus = abs(delta.days)
-                if number >= delta_plus:
-                    print(f"Contact {key} has a birthday in {delta_plus} days ")
-                else:
-                    continue
-            elif birthday_next_year >= today:
-                delta = birthday_next_year - today
-                delta_plus = abs(delta.days)
-                if number >= delta_plus:
-                    print(f"Contact {key} has a birthday in {delta_plus} days ")
-                else:
-                    continue
-            else:
-                print(f"No contacts whose birthday is in {number} days")
+        not_cont_with_birthday=True
+        for key, value in self.data.items():
+            if value.birthday:
+                number = int(args[0])
+                today = date.today()
+                birthday_this_year = date(today.year, value.birthday.value.month, value.birthday.value.day)
+                birthday_next_year = date(today.year + 1, value.birthday.value.month, value.birthday.value.day)
+                if birthday_this_year >= today:
+                    delta = birthday_this_year - today
+                    delta_plus = abs(delta.days)
+                    if number >= delta_plus:
+                        print(f"У {key} день народження через {delta_plus} днів ")
+                        not_cont_with_birthday = False
+                        continue
+                if birthday_next_year >= today:
+                    delta = birthday_next_year - today
+                    delta_plus = abs(delta.days)
+                    if number >= delta_plus:
+                        print(f"У {key} день народження через {delta_plus} днів ")
+                        not_cont_with_birthday = False
+                        continue
+        if not_cont_with_birthday:
+            cprint(f"В цей проміжок немає днів народження", 'red')
 
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
-        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue'),colored("Address", 'light_blue')]
+        x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
         for key, values in self.data.items():
             x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
@@ -230,7 +220,7 @@ class Phone(Field):
         elif value[0] == '-':
             self.__value = value[1:]
         elif  len(value) < 9 or len(value) > 12:
-            print(f"Invalid phone: {value}, phone number should consists 10-12 digits. If you wish to save any text as phone use '-' before number")
+            print(f"Невалідний номер: {value}, повинен містити лише 10-12 цифр.")
             raise ValueError()
         else:
             self.__value = value  
@@ -249,7 +239,7 @@ class Birthday(Field):
                 self.__value = datetime.strptime(new_value, '%d/%m/%Y').date()
         
             except (ValueError):
-                print("Invalid data. Enter date in format DD/MM/YYYY")
+                print("Неваліда дата народження: {new_value}, (DD/MM/YYYY)")
                 raise ValueError("Invalid data. Enter date in format dd/mm/YYYY")
 
 
@@ -263,7 +253,7 @@ class Email(Field):
         if value == '.':
             self.__value = None
         elif not re.match(r"[a-zA-Z]{1}[\w\.]+@[a-zA-Z]+\.[a-zA-Z]{2,}", value):
-            print(f"Invalid email format: {value}. Email format should be name@domain.com")
+            print(f"Невалідний email: {value}. Приклад name@domain.com")
             raise ValueError()
         else:
             self.__value = value
@@ -309,7 +299,7 @@ class Record:
             if phone == old_phone:
                 self.add_phone(new_phone)
                 self.phones.remove(phone)
-                return f'{self.name} changed his number!'
+                return f'Номер {del_phone} видалено.'
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
@@ -373,13 +363,16 @@ def input_error(func):
         except KeyError:
             print('Enter user name.')
         except ValueError:
-            print('Incorrect data in input.')
+            #print('Incorrect data in input.')
+            cprint('Некоректні данні', 'red')
         except IndexError:
-            print('You entered not correct number of args')
+            #print('You entered not correct number of args')
+            cprint('Введіть правильну кількість аргументів', 'red')
         except TypeError:
             print('Use commands')
         except StopIteration:
-            print('This was last contact')
+            #print('This was last contact')
+            cprint('Останній контакт!', 'blue')
     return inner
 
 @input_error
@@ -404,7 +397,7 @@ def change_contact(args):
 @input_error
 def change_email(args):
     if args[0] not in phone_book.keys():
-        return f'{args[0]} is not in contacts!'
+        return f'{args[0]} Такого контакту неіснуе!'
     record = phone_book.data.get(args[0])
     for key in phone_book.keys():            
         if key == args[0]:
@@ -414,12 +407,12 @@ def change_email(args):
 @input_error
 def change_birthday(args): 
     if args[0] not in phone_book.keys():
-        return f'{args[0]} is not in contacts!'
+        return f'{args[0]} Такого контакту неіснуе!'
     record = phone_book.data.get(args[0])
     for key in phone_book.keys():            
         if key == args[0]:
             record.change_birthday_in(Birthday(args[1]))
-        return f'Birthday was changed in Contact > {record}'
+        return f'День народження змінено > {record}'
 
 @input_error
 def del_phone(args):
