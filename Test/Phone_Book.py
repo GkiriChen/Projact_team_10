@@ -347,7 +347,8 @@ class Record:
 
 
 file_name = 'Address_Book.bin'
-commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days', 'exit']
+# commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days', 'exit']
+commands = ['add', 'phones', 'show_all', 'next', 'del_phone', 'del_contact', 'edit_contact', 'search', 'birthday_in_days', 'help', 'exit']
 
 def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
@@ -355,7 +356,7 @@ def show_help():
     x.field_names = [colored("Робота з адресною книгою, наразі доступні наступні команди:", 'light_blue')]
     for a, i in enumerate(commands, start=1):
         x.add_row([colored(f"{a}. {i}","blue")])
-    x.add_row([colored("0. exit", "blue")])
+    # x.add_row([colored("0. exit", "blue")])
     return x # показуємо табличку
 
 def pack_data():
@@ -481,8 +482,8 @@ def main():
             break
         elif b == 'show_all' or d == 'show_all':
             print(phone_book.show_all_cont())
-        elif b == 'hello' or d == 'hello':
-            print('How can i help you?')
+        # elif b == 'hello' or d == 'hello':
+        #     print('How can i help you?')
         elif b == 'help' or d == 'help':
             print(show_help())
         elif b == 'next' or d == 'next':
@@ -493,12 +494,12 @@ def main():
             cprint('Enter arguments to command', 'red')
         elif d == 'add':
             cprint(add_contact(args), 'blue')
-        elif d == 'change':
-            cprint(change_contact(args), 'green')
-        elif d == 'change_email':
-            cprint(change_email(args), 'green')
-        elif d == 'change_bd':
-            cprint(change_birthday(args), 'green')
+        # elif d == 'change':
+        #     cprint(change_contact(args), 'green')
+        # elif d == 'change_email':
+        #     cprint(change_email(args), 'green')
+        # elif d == 'change_bd':
+            # cprint(change_birthday(args), 'green')
         elif d == 'phones':
             print(phone_book.show_phones(args))
         elif d == 'del_phone':
