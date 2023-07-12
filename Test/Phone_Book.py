@@ -74,21 +74,21 @@ class AddressBook(UserDict):
         #     x.add_row([colored(f"{values.name}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
         return print(search_result)
     # >>>>>
-    def add_contact2(self, args):
-        if args is str:
-            record = Record(Name(args))
-            self.add_record(record)
-            return f'New contact was added: {record}'
-        record = self.data.get(args[0])
-        if record is None:
-            if len(args) != 5:
-                return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
-            record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]), Address(args[4]))
-            self.add_record(record)
-            return f'A new contact: {args[0]}, has been added.'
-        else:
-            record.add_phone(Phone(args[1]))
-            return 'Added one more phone number'
+    # def add_contact2(self, args):
+    #     if args is str:
+    #         record = Record(Name(args))
+    #         self.add_record(record)
+    #         return f'New contact was added: {record}'
+    #     record = self.data.get(args[0])
+    #     if record is None:
+    #         if len(args) != 5:
+    #             return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
+    #         record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]), Address(args[4]))
+    #         self.add_record(record)
+    #         return f'A new contact: {args[0]}, has been added.'
+    #     else:
+    #         record.add_phone(Phone(args[1]))
+    #         return 'Added one more phone number'
 
     def add_contact(self, args):
         name = args[0]
@@ -108,7 +108,7 @@ class AddressBook(UserDict):
                 record.add_phone(Phone(item))
         
         self.add_record(record)
-        return f'A new contact: {name}, has been added.'
+        cprint (f'Контакт : {name}, створений', 'green')
 
     def delete_contact(self, contact_name):
         """     5555
@@ -159,6 +159,10 @@ class AddressBook(UserDict):
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_birthday_in(Birthday(input_phone[0]))
+                    elif input == 'address':
+                        text = f'Введіть нову адресу" > '
+                        new_value = session2.prompt(text)
+                        contact_to_change.change_address_iner(Address(new_value))
                     elif input == 'name':
                         cprint('Вибачте зміна імені не доступна', 'red')
 
@@ -293,14 +297,14 @@ class Record:
         self.email = None
         self.address = None
         
-        if phone and phone != '.':
-            self.phones.append(phone)
-        if birthday and birthday != '.':
-            self.birthday = birthday
-        if email and email != '.':
-            self.email = email
-        if address and address != '.':
-            self.address = address
+        # if phone and phone != '.':
+        #     self.phones.append(phone)
+        # if birthday and birthday != '.':
+        #     self.birthday = birthday
+        # if email and email != '.':
+        #     self.email = email
+        # if address and address != '.':
+        #     self.address = address
 
     def __str__(self):
         return f'{self.name}{self.phones}{self.birthday}{self.email}{self.address}'
@@ -339,7 +343,8 @@ class Record:
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
-        return f'Email was changed in Contact > {self.birthday}'
+        return f'Дата народження змінена'
+    
     
     def change_email_iner(self, email: Email):
         self.email = email
@@ -368,7 +373,8 @@ class Record:
 
 
 file_name = 'Address_Book.bin'
-commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days']
+commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd',
+             'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days', 'exit']
 
 def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
@@ -488,7 +494,7 @@ def main():
     while True:
        
         b = session.prompt('Введіть потрібну вам команду > ').strip() 
-        c = ['good bye', 'close', 'exit']
+        c = ['exit']
         d, *args = b.split(' ')
        
         with contextlib.suppress(ValueError):
