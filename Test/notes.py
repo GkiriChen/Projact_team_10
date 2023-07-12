@@ -161,7 +161,7 @@ def main():
             note = input("Введіть свою нотатку" + PROMPT)
             notes.add_note(note)
             notes.save_to_file()
-            print("-- Вашу нотатку додано --")
+            cprint('-- Вашу нотатку додано --','green')
         elif answer == "show":  #вывод всех заметок
             print(notes.show_notes())
         elif answer == "find":  #поиск по заметкам
@@ -177,14 +177,14 @@ def main():
             note = input("Введіть новий текст" + PROMPT)
             notes.edit_note(note, id)
             notes.save_to_file()
-            print("-- Нотатку змінено --")
+            cprint('-- Нотатку змінено --','green')
         elif answer == "tag":  #добавление тегов в заметку
             id = int(input("Введіть id нотатки" + PROMPT))
             print(notes.show_notes({id: notes.data[id]}))
             note = input("Введіть тег" + PROMPT)
             notes.add_tags(id, note)
             notes.save_to_file()
-            print("-- Тег додано --")
+            cprint('-- Тег додано --','green')
         elif answer == "tagfind":   #поиск по тегу
             string = input("Який тег знайти" + PROMPT)
             res = notes.find_by_tag(string)
@@ -196,11 +196,11 @@ def main():
             id = int(input("Введіть id нотатки" + PROMPT))
             notes.del_note(id)
             notes.save_to_file()
-            print("-- Нотатку видалено --")
+            cprint('-- Нотатку видалено --','green')
         elif answer in ["exit", ""]:    #выход из цикла
             notes.save_to_file()
-            print("Good bay!")
-            break    
+            cprint('See you soon!','green')
+            break
     pass
 
 
