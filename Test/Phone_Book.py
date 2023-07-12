@@ -32,13 +32,13 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    # def show_phones(self, args):
-    #     if args[0] in self.data.keys():
-    #         for i, j in self.data.items():
-    #             if args[0] == i:
-    #                 print(j.phones)
-    #     else:
-    #         print(f'No {args[0]} in Address_book')
+    def show_phones(self, args):
+        if args[0] in self.data.keys():
+            for i, j in self.data.items():
+                if args[0] == i:
+                    return f'Контакт: {args[0]} номери: {j.phones}'
+        else:
+            return f'No {args[0]} in Address_book'
 
     def iterator(self):
         if not self.__iterator:
@@ -67,28 +67,32 @@ class AddressBook(UserDict):
                     if args[0] in str(j):
                         search_result.append(self.data[i])
                         break
-        # x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
-        # x.field_names = [colored("Що вдалося знайти:", 'light_blue')]
-        # x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
-        # for values in search_result:
-        #     x.add_row([colored(f"{values.name}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
-        return print(search_result)
-    # >>>>>
+        x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue'),colored("Address", 'light_blue')]
+        for values in search_result:
+            x.add_row([colored(f"{values.name}","blue"),colored(f"{values.phones}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        return x
+        
+        
     def add_contact(self, args):
-        if args is str:
-            record = Record(Name(args))
-            self.add_record(record)
-            return f'New contact was added: {record}'
-        record = self.data.get(args[0])
-        if record is None:
-            if len(args) != 4:
-                return 'Please enter all arguments (Name, Phone, Birthday, Email). \nIf argument is not needed you can skip it using "."\nf.e. Name . . email@domen.com'
-            record = Record(Name(args[0]), Phone(args[1]), Birthday(args[2]), Email(args[3]))
-            self.add_record(record)
-            return f'A new contact: {args[0]}, has been added.'
-        else:
-            record.add_phone(Phone(args[1]))
-            return 'Added one more phone number'
+        name = args[0]
+        record = Record(Name(name))
+        
+        for item in args[1:]:
+            if item.startswith("bd="):
+                birthday_value = item.split("=")[1]
+                record.add_birthday(Birthday(birthday_value)) 
+            elif item.startswith("em="):
+                mail_value = item.split("=")[1]
+                record.add_mail(Email(mail_value)) 
+            elif item.startswith("addr="):
+                addr_value = item.split("=")[1]
+                record.add_address(Address(addr_value))
+            else:
+                record.add_phone(Phone(item))
+        
+        self.add_record(record)
+        return f'Контакт : {name}, створений'
 
     def delete_contact(self, contact_name):
         """     5555
@@ -96,7 +100,8 @@ class AddressBook(UserDict):
         If the contact is found and deleted, it returns "Contact deleted".
         If the contact is not found, it returns "Contact not found".
         """
-        if contact_to_delete := self.data.get(contact_name):
+        contact_to_delete = self.data.get(contact_name)
+        if contact_to_delete:
             del self.data[contact_name]
             return "Контакт успішно видалений"
         else:
@@ -145,11 +150,46 @@ class AddressBook(UserDict):
         else:
             cprint ("Контакт не знайдено", 'red')
     
+    def birthday_in_days(self, args): #add 82-113
+        
+        for key, value in phone_book.data.items():
+            value = str(value)
+            start_index = value.find("]") + 1
+            end_index = value.find("]") + 11
+            birthday = value[start_index:end_index]
+            
+            try:
+                birthday = datetime.strptime(birthday, '%Y-%m-%d')
+            except ValueError:
+                continue
+
+            number = int(args[0])
+            today = date.today()
+            birthday_this_year = date(today.year, birthday.month, birthday.day)
+            birthday_next_year = date(today.year + 1, birthday.month, birthday.day)
+            
+            if birthday_this_year >= today:
+                delta = birthday_this_year - today
+                delta_plus = abs(delta.days)
+                if number >= delta_plus:
+                    print(f"Contact {key} has a birthday in {delta_plus} days ")
+                else:
+                    continue
+            elif birthday_next_year >= today:
+                delta = birthday_next_year - today
+                delta_plus = abs(delta.days)
+                if number >= delta_plus:
+                    print(f"Contact {key} has a birthday in {delta_plus} days ")
+                else:
+                    continue
+            else:
+                print(f"No contacts whose birthday is in {number} days")
+
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
-        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue')]
+        x.field_names = [colored("Name", 'light_blue'),colored("Phone", 'light_blue'),colored("Email", 'light_blue'),colored("Birthday", 'light_blue'),colored("Address", 'light_blue')]
         for key, values in self.data.items():
-            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"),colored(f"{values.birthday}","blue")])
+            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
     
 class Field:
@@ -174,7 +214,8 @@ class Field:
 class Name(Field):
     pass
 
-
+class Address(Field):
+    pass
 
 class Phone(Field):
     # pass
@@ -228,26 +269,31 @@ class Email(Field):
             self.__value = value
 
 class Record:
-    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None):
+    def __init__(self, name: Name, phone: Phone = None, birthday: Birthday = None, email: Email = None, address: Address = None):
         self.name = name
         self.phones = []
         self.birthday = None
         self.email = None
-        if phone and phone != '.':
-            self.phones.append(phone)
-        if birthday and birthday != '.':
-            self.birthday = birthday
-        if email and email != '.':
-            self.email = email
+        self.address = None
+
     def __str__(self):
-        return self.name, self.phones, self.email, self.birthday
+        return f'{self.name} {self.phones} {self.birthday} {self.email} {self.address}'
 
     def __repr__(self):
-        return self.name, self.phones, self.email, self.birthday
+        return f'{self.name} {self.phones} {self.birthday} {self.email} {self.address}'
 
 
     def add_phone(self, phone: Phone):
         self.phones.append(phone)
+    
+    def add_birthday(self, birthday: Birthday):
+        self.birthday = birthday
+    
+    def add_mail(self, email: Email):
+        self.email = email
+
+    def add_address(self, address: Address):
+        self.address = address
     
     def show_phones(self):
         return self.phones
@@ -258,21 +304,26 @@ class Record:
     def show_email(self):
         return self.email
 
-    def change_phone(self, old_phone, new_phone):
+    def change_phone(self, old_phone : Phone, new_phone : Phone):
         for phone in self.phones:
-            if phone.value == old_phone:
+            if phone == old_phone:
                 self.add_phone(new_phone)
                 self.phones.remove(phone)
-                # return True
+                return f'{self.name} changed his number!'
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
-        return f'Email was changed in Contact > {self.birthday}'
+        return f'Дата народження змінена'
+    
     
     def change_email_iner(self, email: Email):
         self.email = email
         return f'{self.email}'
     
+    def change_address_iner(self, address: Address):
+        self.address = address
+        return f'{self.address}'
+
     def delete_phone(self, new_phone):
         for phone in self.phones:
             if phone == new_phone:
@@ -292,7 +343,8 @@ class Record:
 
 
 file_name = 'Address_Book.bin'
-commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help']
+# commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days', 'exit']
+commands = ['add', 'phones', 'show_all', 'next', 'del_phone', 'del_contact', 'edit_contact', 'search', 'birthday_in_days', 'help', 'exit']
 
 def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
@@ -300,7 +352,7 @@ def show_help():
     x.field_names = [colored("Робота з адресною книгою, наразі доступні наступні команди:", 'light_blue')]
     for a, i in enumerate(commands, start=1):
         x.add_row([colored(f"{a}. {i}","blue")])
-    x.add_row([colored("0. close, exit", "blue")])
+    # x.add_row([colored("0. exit", "blue")])
     return x # показуємо табличку
 
 def pack_data():
@@ -342,11 +394,12 @@ def change_contact(args):
     if args[0] not in phone_book.keys():  
         record.add_phone(args)  
         return f'{args[0]} added to contacts!'
-    else:          
-        for key in phone_book.keys():            
-            if key == args[0]:
-                record.change_phone(args[1], args[2])
-                return f'{key} changed his number!'
+    elif len(args) == 3:          
+        for key, values in phone_book.items():            
+            if key == args[0] and args[1] in str(values.phones):
+                record.change_phone(Phone(args[1]), Phone(args[2]))
+    else:
+        return f"Для зміни номеру контакта введіть введіть у наступній послідовності:\n Ім'я старий номер новий номер"
 
 @input_error
 def change_email(args):
@@ -374,7 +427,7 @@ def del_phone(args):
     for key in phone_book.keys():            
             if key == args[0]:
                 record.delete_phone(args[1])
-                print(f'Phone {args[1]} was deleted from {key} contact!')
+                return f'Phone {args[1]} was deleted from {key} contact!'
 
 def search(args):
     global phone_book
@@ -392,7 +445,12 @@ def edit_contact(args):
 
 @input_error
 def show():
-    return print(next(phone_book.iterator()))
+    return next(phone_book.iterator())
+
+@input_error
+def birthday_in_days(args):
+    global phone_book
+    phone_book.birthday_in_days(args)
 
 @input_error
 def main():
@@ -406,7 +464,7 @@ def main():
     session = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter(commands))
     while True:
         b = session.prompt('Введіть потрібну вам команду > ').strip() 
-        c = ['good bye', 'close', 'exit']
+        c = ['exit']
         d, *args = b.split(' ')
         with contextlib.suppress(ValueError):
             if int(d):
@@ -420,28 +478,30 @@ def main():
             break
         elif b == 'show_all' or d == 'show_all':
             print(phone_book.show_all_cont())
-        elif b == 'hello' or d == 'hello':
-            print('How can i help you?')
+        # elif b == 'hello' or d == 'hello':
+        #     print('How can i help you?')
         elif b == 'help' or d == 'help':
             print(show_help())
         elif b == 'next' or d == 'next':
-            show()
+            print(show())
+        elif d == 'birthday_in_days':
+            birthday_in_days(args)
         elif b in commands:
             cprint('Enter arguments to command', 'red')
         elif d == 'add':
             cprint(add_contact(args), 'blue')
-        elif d == 'change':
-            cprint(change_contact(args), 'green')
-        elif d == 'change_email':
-            cprint(change_email(args), 'green')
-        elif d == 'change_bd':
-            cprint(change_birthday(args), 'green')
+        # elif d == 'change':
+        #     cprint(change_contact(args), 'green')
+        # elif d == 'change_email':
+        #     cprint(change_email(args), 'green')
+        # elif d == 'change_bd':
+            # cprint(change_birthday(args), 'green')
         elif d == 'phones':
-            phone_book.show_phones(args)
+            print(phone_book.show_phones(args))
         elif d == 'del_phone':
-            del_phone(args)
+            print(del_phone(args))
         elif d == 'search':
-            search(args)
+            print(search(args))
         elif d == 'del_contact':
             cprint(del_record(args), 'green')
         elif d == 'edit_contact':
