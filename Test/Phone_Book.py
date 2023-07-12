@@ -36,9 +36,9 @@ class AddressBook(UserDict):
         if args[0] in self.data.keys():
             for i, j in self.data.items():
                 if args[0] == i:
-                    print(j.phones)
+                    return f'Контакт: {args[0]} номери: {j.phones}'
         else:
-            print(f'No {args[0]} in Address_book')
+            return f'No {args[0]} in Address_book'
 
     def iterator(self):
         if not self.__iterator:
@@ -308,12 +308,12 @@ class Record:
     def show_email(self):
         return self.email
 
-    def change_phone(self, old_phone, new_phone):
+    def change_phone(self, old_phone : Phone, new_phone : Phone):
         for phone in self.phones:
-            if phone.value == old_phone:
+            if phone == old_phone:
                 self.add_phone(new_phone)
                 self.phones.remove(phone)
-                # return True
+                return f'{self.name} changed his number!'
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
@@ -397,11 +397,12 @@ def change_contact(args):
     if args[0] not in phone_book.keys():  
         record.add_phone(args)  
         return f'{args[0]} added to contacts!'
-    else:          
-        for key in phone_book.keys():            
-            if key == args[0]:
-                record.change_phone(args[1], args[2])
-                return f'{key} changed his number!'
+    elif len(args) == 3:          
+        for key, values in phone_book.items():            
+            if key == args[0] and args[1] in str(values.phones):
+                record.change_phone(Phone(args[1]), Phone(args[2]))
+    else:
+        return f"Для зміни номеру контакта введіть введіть у наступній послідовності:\n Ім'я старий номер новий номер"
 
 @input_error
 def change_email(args):
@@ -429,7 +430,7 @@ def del_phone(args):
     for key in phone_book.keys():            
             if key == args[0]:
                 record.delete_phone(args[1])
-                print(f'Phone {args[1]} was deleted from {key} contact!')
+                return f'Phone {args[1]} was deleted from {key} contact!'
 
 def search(args):
     global phone_book
@@ -447,7 +448,7 @@ def edit_contact(args):
 
 @input_error
 def show():
-    return print(next(phone_book.iterator()))
+    return next(phone_book.iterator())
 
 @input_error
 def birthday_in_days(args):
@@ -485,7 +486,7 @@ def main():
         elif b == 'help' or d == 'help':
             print(show_help())
         elif b == 'next' or d == 'next':
-            show()
+            print(show())
         elif d == 'birthday_in_days':
             birthday_in_days(args)
         elif b in commands:
@@ -499,9 +500,9 @@ def main():
         elif d == 'change_bd':
             cprint(change_birthday(args), 'green')
         elif d == 'phones':
-            phone_book.show_phones(args)
+            print(phone_book.show_phones(args))
         elif d == 'del_phone':
-            del_phone(args)
+            print(del_phone(args))
         elif d == 'search':
             print(search(args))
         elif d == 'del_contact':
