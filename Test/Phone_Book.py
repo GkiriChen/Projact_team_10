@@ -156,14 +156,14 @@ class AddressBook(UserDict):
     
     def birthday_in_days(self, args): #add 82-113
         
-        for key, value in phone_book.data.items():
+        for key, value in self.data.items():
             value = str(value)
             start_index = value.find("]") + 1
             end_index = value.find("]") + 11
             birthday = value[start_index:end_index]
             
             try:
-                birthday = datetime.strptime(birthday, '%Y-%m-%d')
+                birthday = datetime.strptime(birthday.strip(), '%Y-%m-%d')
             except ValueError:
                 continue
 
@@ -454,7 +454,7 @@ def show():
 @input_error
 def birthday_in_days(args):
     global phone_book
-    phone_book.birthday_in_days(args)
+    return phone_book.birthday_in_days(args)
 
 @input_error
 def main():
