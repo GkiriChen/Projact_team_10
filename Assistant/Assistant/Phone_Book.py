@@ -334,7 +334,7 @@ class Record:
 
 file_name = 'Address_Book.bin'
 # commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days', 'exit']
-commands = ['add', 'phones', 'show_all', 'next', 'del_phone', 'del_contact', 'edit_contact', 'search', 'birthday_in_days', 'help', 'exit']
+commands = ['add', 'phones', 'show_all', 'next', 'del_contact', 'edit_contact', 'search', 'birthday_in_days', 'help', 'exit']
 
 def show_help():      
     x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
@@ -443,7 +443,7 @@ def show():
 @input_error
 def birthday_in_days(args):
     global phone_book
-    return phone_book.birthday_in_days(args)
+    phone_book.birthday_in_days(args)
 
 @input_error
 def main():
@@ -491,8 +491,8 @@ def main():
             # cprint(change_birthday(args), 'green')
         elif d == 'phones':
             print(phone_book.show_phones(args))
-        elif d == 'del_phone':
-            print(del_phone(args))
+        # elif d == 'del_phone':
+        #     print(del_phone(args))
         elif d == 'search':
             print(search(args))
         elif d == 'del_contact':
