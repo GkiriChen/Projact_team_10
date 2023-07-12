@@ -382,7 +382,7 @@ def show_help():
     x.field_names = [colored("Робота з адресною книгою, наразі доступні наступні команди:", 'light_blue')]
     for a, i in enumerate(commands, start=1):
         x.add_row([colored(f"{a}. {i}","blue")])
-    x.add_row([colored("0. close, exit", "blue")])
+    x.add_row([colored("0. exit", "blue")])
     return x # показуємо табличку
 
 def pack_data():
