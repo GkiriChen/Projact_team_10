@@ -158,45 +158,45 @@ def main():
     while True:
         answer = session.prompt('Введіть команду' + PROMPT).strip()
         if answer == 'add':     #добавление заметки
-            note = input("Tape your note " + PROMPT)
+            note = input("Введіть свою нотатку" + PROMPT)
             notes.add_note(note)
             notes.save_to_file()
-            print("-- Your note added --")
+            print("-- Вашу нотатку додано --")
         elif answer == "show":  #вывод всех заметок
             print(notes.show_notes())
         elif answer == "find":  #поиск по заметкам
-            string = input("What find " + PROMPT)
+            string = input("Що знайти" + PROMPT)
             res = notes.find_in_notes(string)
             if not len(res):
-                print("-- No matches found --")
+                print("-- Співпадінь не знайдено --")
             else:
                 print(notes.show_notes(res))
         elif answer == "edit":  #редактирование заметки
-            id = int(input("Enter note id " + PROMPT))
+            id = int(input("Введіть id нотатки" + PROMPT))
             print(notes.show_notes({id: notes.data[id]}))
-            note = input("Edit note " + PROMPT)
+            note = input("Введіть новий текст" + PROMPT)
             notes.edit_note(note, id)
             notes.save_to_file()
-            print("-- Note saved --")
+            print("-- Нотатку змінено --")
         elif answer == "tag":  #добавление тегов в заметку
-            id = int(input("Enter note id " + PROMPT))
+            id = int(input("Введіть id нотатки" + PROMPT))
             print(notes.show_notes({id: notes.data[id]}))
-            note = input("Add tags " + PROMPT)
+            note = input("Введіть тег" + PROMPT)
             notes.add_tags(id, note)
             notes.save_to_file()
-            print("-- Tags added --")
+            print("-- Тег додано --")
         elif answer == "tagfind":   #поиск по тегу
-            string = input("What tag find " + PROMPT)
+            string = input("Який тег знайти" + PROMPT)
             res = notes.find_by_tag(string)
             if not len(res):
-                print("-- No matches found --")
+                print("-- Співпадінь не знайдено --")
             else:
                 print(notes.show_notes(res))
         elif answer == "del":  #удаление заметки
-            id = int(input("Enter note id " + PROMPT))
+            id = int(input("Введіть id нотатки" + PROMPT))
             notes.del_note(id)
             notes.save_to_file()
-            print("-- Note deleted --")
+            print("-- Нотатку видалено --")
         elif answer in ["exit", ""]:    #выход из цикла
             notes.save_to_file()
             print("Good bay!")
