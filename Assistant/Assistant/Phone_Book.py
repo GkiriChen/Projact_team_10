@@ -32,13 +32,25 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    def show_phones(self, args):
-        if args[0] in self.data.keys():
-            for i, j in self.data.items():
-                if args[0] == i:
-                    return f'Контакт: {args[0]} номери: {j.phones}'
-        else:
+    def del_phone(self, args):
+        if args[0] not in self.data.keys():
             return f'Контакт {args[0]} відсутній'
+        for key, values in self.data.items():
+            if args[0] == key and len(values.phones) != 0:
+                    for phone in values.phones:
+                        if Phone(args[1]).value == phone.value:
+                            values.phones.remove(phone)
+                            return f'Номер {phone} видалено!'
+                    return f'Номер {phone} незнайдено!'
+        return f'Контакт {args[0]} немає номерів!'
+                # return f'Контакт: {args[0]} номери: {j.phones}'
+            
+    def show_phones(self, args):
+        if args[0] not in self.data.keys():
+            return f'Контакт {args[0]} відсутній'
+        for i, j in self.data.items():
+            if args[0] == i:
+                return f'Контакт: {args[0]} номери: {j.phones}'
 
     def iterator(self):
         if not self.__iterator:
@@ -77,11 +89,9 @@ class AddressBook(UserDict):
     def add_contact(self, args):
         name = args[0]
         
-        contact_in = self.data.get(name)
-        if contact_in:
+        if self.data.get(name):
             return "Такий контакт вже існує"
         record = Record(Name(name))
-           
         for item in args[1:]:
             if item.startswith("bd="):
                 birthday_value = item.split("=")[1]
@@ -104,8 +114,7 @@ class AddressBook(UserDict):
         If the contact is found and deleted, it returns "Contact deleted".
         If the contact is not found, it returns "Contact not found".
         """
-        contact_to_delete = self.data.get(contact_name)
-        if contact_to_delete:
+        if self.data.get(contact_name):
             del self.data[contact_name]
             return "Контакт успішно видалений"
         else:
@@ -177,7 +186,7 @@ class AddressBook(UserDict):
                         not_cont_with_birthday = False
                         continue
         if not_cont_with_birthday:
-            cprint(f"В цей проміжок немає днів народження", 'red')
+            cprint("В цей проміжок немає днів народження", 'red')
 
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
@@ -307,7 +316,7 @@ class Record:
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
-        return f'Дата народження змінена'
+        return 'Дата народження змінена'
     
     
     def change_email_iner(self, email: Email):
@@ -396,7 +405,7 @@ def change_contact(args):
             if key == args[0] and args[1] in str(values.phones):
                 record.change_phone(Phone(args[1]), Phone(args[2]))
     else:
-        return f"Для зміни номеру контакта введіть введіть у наступній послідовності:\n Ім'я старий номер новий номер"
+        return "Для зміни номеру контакта введіть введіть у наступній послідовності:\n Ім'я старий номер новий номер"
 
 @input_error
 def change_email(args):
@@ -420,11 +429,13 @@ def change_birthday(args):
 
 @input_error
 def del_phone(args):
-    record = phone_book.data.get(args[0])
-    for key in phone_book.keys():            
-            if key == args[0]:
-                record.delete_phone(args[1])
-                return f'Phone {args[1]} was deleted from {key} contact!'
+    return phone_book.del_phone(args)
+    
+    # record = phone_book.data.get(args[0])
+    # for key in phone_book.keys():            
+    #         if key == args[0]:
+    #             record.delete_phone(args[1])
+    #             return f'Phone {args[1]} was deleted from {key} contact!'
 
 def search(args):
     global phone_book
@@ -442,7 +453,7 @@ def edit_contact(args):
 
 @input_error
 def show():
-   cprint(next(phone_book.iterator()), 'green')
+    cprint(next(phone_book.iterator()), 'green')
 
 @input_error
 def birthday_in_days(args):
