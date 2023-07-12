@@ -76,8 +76,12 @@ class AddressBook(UserDict):
         
     def add_contact(self, args):
         name = args[0]
-        record = Record(Name(name))
         
+        contact_in = self.data.get(name)
+        if contact_in:
+            return "Такий контакт вже існує"
+        record = Record(Name(name))
+           
         for item in args[1:]:
             if item.startswith("bd="):
                 birthday_value = item.split("=")[1]
