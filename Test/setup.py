@@ -8,6 +8,6 @@ setup(name='Assistant',
       license='MIT',
       packages=find_namespace_packages(),
       include_package_data=True,
-      python_requires='>=3.11',
+      python_requires='>=3.6',
       entry_points={'console_scripts': ['Assistant=start_page.clean:main']}
-)
+)s
