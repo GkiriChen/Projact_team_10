@@ -162,7 +162,7 @@ class AddressBook(UserDict):
                     elif input == 'address':
                         text = f'Введіть нову адресу" > '
                         new_value = session2.prompt(text)
-                        contact_to_change.change_address_iner(Address(new_value))
+                        contact_to_change.change_address_iner(Address(new_value))                    
                     elif input == 'name':
                         cprint('Вибачте зміна імені не доступна', 'red')
 
@@ -539,6 +539,7 @@ def main():
             edit_contact(args)
         else:
             cprint('Please enter correct command. Use command "help" to see more.', 'red')
+
 
 if __name__ == "__main__":
     main()
