@@ -1,3 +1,4 @@
+import contextlib
 from collections import UserDict
 from datetime import datetime
 import pickle
@@ -27,7 +28,7 @@ class IntentCompleter(Completer):
 
 
 class Notes(UserDict):
-    filename = 'notes.sav'
+    filename = 'Assistant/notes.sav'
     MAX_STR_LEN = 50
     # notes = {}
 
@@ -136,9 +137,9 @@ def fake_notes(notes):
 def show_greeting(commands):
     x = PrettyTable(align='l') 
     x.field_names = [colored("Доступні команди:", 'light_blue')]
-    for el in commands:
-        x.add_row([colored(el,"blue")])     
-    print(x)
+    for a, i in enumerate(commands, start=1):
+        x.add_row([colored(f"{a}. {i}","blue")])     
+    return x
 
 
 def main():
@@ -153,51 +154,57 @@ def main():
     else:
         notes = notes.read_from_file()
 
-    show_greeting(commands)
+    print(show_greeting(commands))
 
     while True:
         answer = session.prompt('Введіть команду' + PROMPT).strip()
-        if answer == 'add':     #добавление заметки
+        d, *args = answer.split(' ')
+        with contextlib.suppress(ValueError):
+            if int(d):
+                for a, i in enumerate(commands, start=1):
+                    if a == int(d):
+                        d = i
+        if answer == 'add' or d == 'add':     #добавление заметки
             note = input("Введіть свою нотатку" + PROMPT)
             notes.add_note(note)
             notes.save_to_file()
             print("-- Вашу нотатку додано --")
-        elif answer == "show":  #вывод всех заметок
+        elif answer == "show" or d == 'show':  #вывод всех заметок
             print(notes.show_notes())
-        elif answer == "find":  #поиск по заметкам
+        elif answer == "find" or d == 'find':  #поиск по заметкам
             string = input("Що знайти" + PROMPT)
             res = notes.find_in_notes(string)
             if not len(res):
                 print("-- Співпадінь не знайдено --")
             else:
                 print(notes.show_notes(res))
-        elif answer == "edit":  #редактирование заметки
+        elif answer == "edit" or d == 'edit':  #редактирование заметки
             id = int(input("Введіть id нотатки" + PROMPT))
             print(notes.show_notes({id: notes.data[id]}))
             note = input("Введіть новий текст" + PROMPT)
             notes.edit_note(note, id)
             notes.save_to_file()
             print("-- Нотатку змінено --")
-        elif answer == "tag":  #добавление тегов в заметку
+        elif answer == "tag" or d == 'tag':  #добавление тегов в заметку
             id = int(input("Введіть id нотатки" + PROMPT))
             print(notes.show_notes({id: notes.data[id]}))
             note = input("Введіть тег" + PROMPT)
             notes.add_tags(id, note)
             notes.save_to_file()
             print("-- Тег додано --")
-        elif answer == "tagfind":   #поиск по тегу
+        elif answer == "tagfind" or d == 'tagfind':   #поиск по тегу
             string = input("Який тег знайти" + PROMPT)
             res = notes.find_by_tag(string)
             if not len(res):
                 print("-- Співпадінь не знайдено --")
             else:
                 print(notes.show_notes(res))
-        elif answer == "del":  #удаление заметки
+        elif answer == "del" or d == 'del':  #удаление заметки
             id = int(input("Введіть id нотатки" + PROMPT))
             notes.del_note(id)
             notes.save_to_file()
             print("-- Нотатку видалено --")
-        elif answer in ["exit", ""]:    #выход из цикла
+        elif answer in ["exit", ""] or d == 'exit':    #выход из цикла
             notes.save_to_file()
             print("Good bay!")
             break    
