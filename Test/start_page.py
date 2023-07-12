@@ -1,7 +1,8 @@
 
 from termcolor import colored, cprint
 from prettytable import PrettyTable
-import os, Phone_Book, notes, clean
+import os
+from Assistant import Phone_Book, notes, clean
 
 
 def input_text():
@@ -63,4 +64,3 @@ def run():
 
 if __name__ == '__main__':
     run()
-
