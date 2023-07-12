@@ -76,8 +76,12 @@ class AddressBook(UserDict):
         
     def add_contact(self, args):
         name = args[0]
-        record = Record(Name(name))
         
+        contact_in = self.data.get(name)
+        if contact_in:
+            return "Такий контакт вже існує"
+        record = Record(Name(name))
+           
         for item in args[1:]:
             if item.startswith("bd="):
                 birthday_value = item.split("=")[1]
@@ -378,7 +382,7 @@ def input_error(func):
 @input_error
 def add_contact(args):   
     global phone_book
-    return phone_book.add_contact(args) 
+    cprint(phone_book.add_contact(args), 'blue')
     
 
 @input_error     
@@ -438,12 +442,12 @@ def edit_contact(args):
 
 @input_error
 def show():
-    return next(phone_book.iterator())
+   cprint(next(phone_book.iterator()), 'green')
 
 @input_error
 def birthday_in_days(args):
     global phone_book
-    phone_book.birthday_in_days(args)
+    return phone_book.birthday_in_days(args)
 
 @input_error
 def main():
@@ -476,13 +480,13 @@ def main():
         elif b == 'help' or d == 'help':
             print(show_help())
         elif b == 'next' or d == 'next':
-            print(show())
+            show()
         elif d == 'birthday_in_days':
             birthday_in_days(args)
         elif b in commands:
             cprint('Enter arguments to command', 'red')
         elif d == 'add':
-            cprint(add_contact(args), 'blue')
+            add_contact(args)
         # elif d == 'change':
         #     cprint(change_contact(args), 'green')
         # elif d == 'change_email':
