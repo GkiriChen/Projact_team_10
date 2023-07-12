@@ -156,38 +156,32 @@ class AddressBook(UserDict):
     
     def birthday_in_days(self, args): #add 82-113
         
+        not_cont_with_birthday=True
         for key, value in self.data.items():
-            value = str(value)
-            start_index = value.find("]") + 1
-            end_index = value.find("]") + 11
-            birthday = value[start_index:end_index]
-            
-            try:
-                birthday = datetime.strptime(birthday.strip(), '%Y-%m-%d')
-            except ValueError:
-                continue
+                      
+            if value.birthday:       
 
-            number = int(args[0])
-            today = date.today()
-            birthday_this_year = date(today.year, birthday.month, birthday.day)
-            birthday_next_year = date(today.year + 1, birthday.month, birthday.day)
-            
-            if birthday_this_year >= today:
-                delta = birthday_this_year - today
-                delta_plus = abs(delta.days)
-                if number >= delta_plus:
-                    print(f"Contact {key} has a birthday in {delta_plus} days ")
-                else:
-                    pass
-            elif birthday_next_year >= today:
-                delta = birthday_next_year - today
-                delta_plus = abs(delta.days)
-                if number >= delta_plus:
-                    print(f"Contact {key} has a birthday in {delta_plus} days ")
-                else:
-                    pass
-            else:
-                print(f"No contacts whose birthday is in {number} days")
+                number = int(args[0])
+                today = date.today()
+                birthday_this_year = date(today.year, value.birthday.value.month, value.birthday.value.day)
+                birthday_next_year = date(today.year + 1, value.birthday.value.month, value.birthday.value.day)
+                
+                if birthday_this_year >= today:
+                    delta = birthday_this_year - today
+                    delta_plus = abs(delta.days)
+                    if number >= delta_plus:
+                        print(f"У {key} день народження через {delta_plus} днів ")
+                        not_cont_with_birthday = False
+                        continue
+                if birthday_next_year >= today:
+                    delta = birthday_next_year - today
+                    delta_plus = abs(delta.days)
+                    if number >= delta_plus:
+                        print(f"У {key} день народження через {delta_plus} днів ")
+                        not_cont_with_birthday = False
+                        continue
+        if not_cont_with_birthday:
+            cprint(f"В цей проміжок немає днів народження", 'red')
 
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
