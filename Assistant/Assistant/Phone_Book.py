@@ -41,7 +41,7 @@ class AddressBook(UserDict):
                         if Phone(args[1]).value == phone.value:
                             values.phones.remove(phone)
                             return f'Номер {phone} видалено!'
-                    return f'Номер {phone} незнайдено!'
+                    return f'Номер {args[1]} незнайдено!'
         return f'Контакт {args[0]} немає номерів!'
                 # return f'Контакт: {args[0]} номери: {j.phones}'
             
