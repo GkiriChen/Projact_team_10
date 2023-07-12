@@ -178,14 +178,14 @@ class AddressBook(UserDict):
                 if number >= delta_plus:
                     print(f"Contact {key} has a birthday in {delta_plus} days ")
                 else:
-                    continue
+                    pass
             elif birthday_next_year >= today:
                 delta = birthday_next_year - today
                 delta_plus = abs(delta.days)
                 if number >= delta_plus:
                     print(f"Contact {key} has a birthday in {delta_plus} days ")
                 else:
-                    continue
+                    pass
             else:
                 print(f"No contacts whose birthday is in {number} days")
 
