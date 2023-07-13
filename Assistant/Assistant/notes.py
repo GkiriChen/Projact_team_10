@@ -82,9 +82,9 @@ class Notes(UserDict):
                 note += colored(t[:l],'blue') + '\n'
                 t = t[l:]
             if v.tags:
-                note += colored(v.show_tags(),'yellow') + '\n'
+                note += colored(v.show_tags(),'light_cyan') + '\n'
             dt = v.datetime.strftime("<%d-%m-%Y %H:%M>")
-            note += colored(dt + ' ' * 25 + 'id: ' + str(k), 'blue')
+            note += colored(dt + ' ' * 25 + 'id: ' + str(k), 'grey')
             x.add_row([note], divider=True)
         return x
 
