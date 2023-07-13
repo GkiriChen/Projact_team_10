@@ -134,10 +134,16 @@ class AddressBook(UserDict):
                 else:
                     session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
                     if input == 'phones':
-                        text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
-                        new_value = session2.prompt(text)
-                        input_phone = new_value.split(' ')
-                        contact_to_change.change_phone(input_phone[0], input_phone[1])
+                        if len(contact_to_change.phones):
+                            text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
+                            new_value = session2.prompt(text)
+                            input_phone = new_value.split(' ')
+                            contact_to_change.change_phone(input_phone[0], input_phone[1])
+                        else:
+                            text = f'Введіть номер телефону який хочете додати у форматі "380XXXXXXXXX" > '
+                            new_value = session2.prompt(text)
+                            input_phone = new_value.split(' ')
+                            contact_to_change.add_phone(Phone(input_phone[0]))
                     elif input == 'email':
                         text = f'Введіть новий email y форматі "first@domen.com" > '
                         new_value = session2.prompt(text)
@@ -148,6 +154,10 @@ class AddressBook(UserDict):
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_birthday_in(Birthday(input_phone[0]))
+                    elif input == 'address':
+                        text = f'Введіть нову адресу > '
+                        new_value = session2.prompt(text)
+                        contact_to_change.change_address_iner(Address(new_value))
                     elif input == 'name':
                         cprint('Вибачте зміна імені не доступна', 'red')
 
