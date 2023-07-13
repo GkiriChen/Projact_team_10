@@ -32,13 +32,25 @@ class AddressBook(UserDict):
     def add_record(self, record):
         self.data[record.name.value] = record
 
-    def show_phones(self, args):
-        if args[0] in self.data.keys():
-            for i, j in self.data.items():
-                if args[0] == i:
-                    return f'Контакт: {args[0]} номери: {j.phones}'
-        else:
+    def del_phone(self, args):
+        if args[0] not in self.data.keys():
             return f'Контакт {args[0]} відсутній'
+        for key, values in self.data.items():
+            if args[0] == key and len(values.phones) != 0:
+                    for phone in values.phones:
+                        if Phone(args[1]).value == phone.value:
+                            values.phones.remove(phone)
+                            return f'Номер {phone} видалено!'
+                    return f'Номер {phone} незнайдено!'
+        return f'Контакт {args[0]} немає номерів!'
+                # return f'Контакт: {args[0]} номери: {j.phones}'
+            
+    def show_phones(self, args):
+        if args[0] not in self.data.keys():
+            return f'Контакт {args[0]} відсутній'
+        for i, j in self.data.items():
+            if args[0] == i:
+                return f'Контакт: {args[0]} номери: {j.phones}'
 
     def iterator(self):
         if not self.__iterator:
@@ -70,19 +82,16 @@ class AddressBook(UserDict):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
         for values in search_result:
-            a = ''.join(f'{i}\n' for i in values.phones)
-            x.add_row([colored(f"{values.name}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+            x.add_row([colored(f"{values.name}","blue"),colored(f"{values.phones}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
         
         
     def add_contact(self, args):
         name = args[0]
         
-        contact_in = self.data.get(name)
-        if contact_in:
+        if self.data.get(name):
             return "Такий контакт вже існує"
         record = Record(Name(name))
-           
         for item in args[1:]:
             if item.startswith("bd="):
                 birthday_value = item.split("=")[1]
@@ -105,8 +114,7 @@ class AddressBook(UserDict):
         If the contact is found and deleted, it returns "Contact deleted".
         If the contact is not found, it returns "Contact not found".
         """
-        contact_to_delete = self.data.get(contact_name)
-        if contact_to_delete:
+        if self.data.get(contact_name):
             del self.data[contact_name]
             return "Контакт успішно видалений"
         else:
@@ -134,16 +142,10 @@ class AddressBook(UserDict):
                 else:
                     session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
                     if input == 'phones':
-                        if len(contact_to_change.phones):
-                            text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
-                            new_value = session2.prompt(text)
-                            input_phone = new_value.split(' ')
-                            contact_to_change.change_phone(input_phone[0], input_phone[1])
-                        else:
-                            text = f'Введіть номер телефону який хочете додати у форматі "380XXXXXXXXX" > '
-                            new_value = session2.prompt(text)
-                            input_phone = new_value.split(' ')
-                            contact_to_change.add_phone(Phone(input_phone[0]))
+                        text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
+                        new_value = session2.prompt(text)
+                        input_phone = new_value.split(' ')
+                        contact_to_change.change_phone(input_phone[0], input_phone[1])
                     elif input == 'email':
                         text = f'Введіть новий email y форматі "first@domen.com" > '
                         new_value = session2.prompt(text)
@@ -154,10 +156,6 @@ class AddressBook(UserDict):
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_birthday_in(Birthday(input_phone[0]))
-                    elif input == 'address':
-                        text = f'Введіть нову адресу > '
-                        new_value = session2.prompt(text)
-                        contact_to_change.change_address_iner(Address(new_value))
                     elif input == 'name':
                         cprint('Вибачте зміна імені не доступна', 'red')
 
@@ -188,19 +186,14 @@ class AddressBook(UserDict):
                         not_cont_with_birthday = False
                         continue
         if not_cont_with_birthday:
-            cprint(f"В цей проміжок немає днів народження", 'red')
+            cprint("В цей проміжок немає днів народження", 'red')
 
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
-        for i, values in self.data.items():
-            # a = '\n'.join(values.phones)
-            a = ''.join(f'{i}\n' for i in values.phones)
-            x.add_row([colored(f"{i}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        for key, values in self.data.items():
+            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
-        # for key, values in self.data.items():
-        #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
-        # return x
     
 class Field:
     def __init__(self, value):
@@ -323,7 +316,7 @@ class Record:
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
-        return f'Дата народження змінена'
+        return 'Дата народження змінена'
     
     
     def change_email_iner(self, email: Email):
@@ -412,7 +405,7 @@ def change_contact(args):
             if key == args[0] and args[1] in str(values.phones):
                 record.change_phone(Phone(args[1]), Phone(args[2]))
     else:
-        return f"Для зміни номеру контакта введіть введіть у наступній послідовності:\n Ім'я старий номер новий номер"
+        return "Для зміни номеру контакта введіть введіть у наступній послідовності:\n Ім'я старий номер новий номер"
 
 @input_error
 def change_email(args):
@@ -436,11 +429,13 @@ def change_birthday(args):
 
 @input_error
 def del_phone(args):
-    record = phone_book.data.get(args[0])
-    for key in phone_book.keys():            
-            if key == args[0]:
-                record.delete_phone(args[1])
-                return f'Phone {args[1]} was deleted from {key} contact!'
+    return phone_book.del_phone(args)
+    
+    # record = phone_book.data.get(args[0])
+    # for key in phone_book.keys():            
+    #         if key == args[0]:
+    #             record.delete_phone(args[1])
+    #             return f'Phone {args[1]} was deleted from {key} contact!'
 
 def search(args):
     global phone_book
@@ -458,7 +453,7 @@ def edit_contact(args):
 
 @input_error
 def show():
-   cprint(next(phone_book.iterator()), 'green')
+    cprint(next(phone_book.iterator()), 'green')
 
 @input_error
 def birthday_in_days(args):
