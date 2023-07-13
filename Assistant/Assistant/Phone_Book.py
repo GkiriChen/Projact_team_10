@@ -35,14 +35,17 @@ class AddressBook(UserDict):
     def del_phone(self, args):
         if args[0] not in self.data.keys():
             return f'Контакт {args[0]} відсутній'
-        for key, values in self.data.items():
-            if args[0] == key and len(values.phones) != 0:
-                    for phone in values.phones:
-                        if Phone(args[1]).value == phone.value:
-                            values.phones.remove(phone)
-                            return f'Номер {phone} видалено!'
-                    return f'Номер {args[1]} незнайдено!'
-        return f'Контакт {args[0]} немає номерів!'
+        elif len(args) == 2:
+            for key, values in self.data.items():
+                if args[0] == key and len(values.phones) != 0:
+                        for phone in values.phones:
+                            if args[1] == phone.value:
+                                values.phones.remove(phone)
+                                return f'Номер {phone} видалено!'
+                        return f'Номер {args[1]} незнайдено!'
+                return f'Контакт {args[0]} немає номерів!'
+        else:
+            return "Введіть Ім'я та Телефон"
                 # return f'Контакт: {args[0]} номери: {j.phones}'
             
     def show_phones(self, args):
@@ -431,8 +434,7 @@ def change_birthday(args):
 
 @input_error
 def del_phone(args):
-    return phone_book.del_phone(args)
-    
+    return phone_book.del_phone(args) if args else "Введіть Ім'я та Телефон"
     # record = phone_book.data.get(args[0])
     # for key in phone_book.keys():            
     #         if key == args[0]:
