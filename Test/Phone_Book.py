@@ -33,12 +33,13 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def show_phones(self, args):
-        if args[0] in self.data.keys():
+        if args:
+            if args[0] not in self.data.keys():
+                return f'Контакт {args[0]} відсутній'
             for i, j in self.data.items():
                 if args[0] == i:
-                    return f'Контакт: {args[0]} номери: {j.phones}'
-        else:
-            return f'Контакт {args[0]} відсутній'
+                    return f'Контакт: {args[0]} номери: {str(j.phones)[1:-1]}'
+        return "Введіть ім'я контакту"
 
     def iterator(self):
         if not self.__iterator:
