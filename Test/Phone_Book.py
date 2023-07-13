@@ -33,12 +33,13 @@ class AddressBook(UserDict):
         self.data[record.name.value] = record
 
     def show_phones(self, args):
-        if args[0] in self.data.keys():
+        if args:
+            if args[0] not in self.data.keys():
+                return f'Контакт {args[0]} відсутній'
             for i, j in self.data.items():
                 if args[0] == i:
-                    return f'Контакт: {args[0]} номери: {j.phones}'
-        else:
-            return f'Контакт {args[0]} відсутній'
+                    return f'Контакт: {args[0]} номери: {str(j.phones)[1:-1]}'
+        return "Введіть ім'я контакту"
 
     def iterator(self):
         if not self.__iterator:
@@ -199,7 +200,8 @@ class AddressBook(UserDict):
             x.add_row([colored(f"{i}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
         # for key, values in self.data.items():
-        #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+           
+        #    x.add_row([colored(f"{key}","blue"),colored(f"{a}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         # return x
     
 class Field:
