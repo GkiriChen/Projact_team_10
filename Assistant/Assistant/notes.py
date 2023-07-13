@@ -6,7 +6,7 @@ import time
 from faker import Faker
 import random
 import os.path
-from prettytable import PrettyTable
+from prettytable import PrettyTable, NONE, ALL
 from termcolor import colored, cprint
 from prompt_toolkit import PromptSession
 from prompt_toolkit.auto_suggest import AutoSuggestFromHistory
@@ -71,19 +71,22 @@ class Notes(UserDict):
         return res
 
     def show_notes(self, data = None):
+        l = self.MAX_STR_LEN
         if not data:
             data = self.data
-        res = '-' * self.MAX_STR_LEN + '\n'
+        x = PrettyTable(align='l', header=False, vrules=NONE)
         for k, v in data.items():
+            note = ''
             t = v.text
             while len(t):
-                res += t[:self.MAX_STR_LEN] + '\n'
-                t = t[self.MAX_STR_LEN:]
+                note += colored(t[:l],'blue') + '\n'
+                t = t[l:]
             if v.tags:
-                res += v.show_tags() + '\n'
-            res += v.datetime.strftime("<%d-%m-%Y %H:%M>") + ' ' * 25 + 'id: ' + str(k) + '\n'
-            res += '-' * self.MAX_STR_LEN + '\n'
-        return res
+                note += colored(v.show_tags(),'light_cyan') + '\n'
+            dt = v.datetime.strftime("<%d-%m-%Y %H:%M>")
+            note += colored(dt + ' ' * 25 + 'id: ' + str(k), 'grey')
+            x.add_row([note], divider=True)
+        return x
 
     def iterator(self, step=5):
         data = list(self.data.values())
