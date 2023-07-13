@@ -28,9 +28,8 @@ class IntentCompleter(Completer):
 
 
 class Notes(UserDict):
-    filename = 'Assistant/notes.sav'
+    filename = 'notes.sav'
     MAX_STR_LEN = 50
-    # notes = {}
 
     def add_note(self, note):
         id = self.new_id()
@@ -169,16 +168,17 @@ def main():
                         d = i
         if answer == 'add' or d == 'add':     #добавление заметки
             note = input("Введіть свою нотатку" + PROMPT)
-            notes.add_note(note)
-            notes.save_to_file()
-            print("-- Вашу нотатку додано --")
+            if note:
+                notes.add_note(note)
+                notes.save_to_file()
+                print("Вашу нотатку додано", 'green')
         elif answer == "show" or d == 'show':  #вывод всех заметок
             print(notes.show_notes())
         elif answer == "find" or d == 'find':  #поиск по заметкам
             string = input("Що знайти" + PROMPT)
             res = notes.find_in_notes(string)
             if not len(res):
-                print("-- Співпадінь не знайдено --")
+                cprint("Співпадінь не знайдено", 'green')
             else:
                 print(notes.show_notes(res))
         elif answer == "edit" or d == 'edit':  #редактирование заметки
@@ -187,29 +187,29 @@ def main():
             note = input("Введіть новий текст" + PROMPT)
             notes.edit_note(note, id)
             notes.save_to_file()
-            print("-- Нотатку змінено --")
+            cprint("Нотатку змінено", 'green')
         elif answer == "tag" or d == 'tag':  #добавление тегов в заметку
             id = int(input("Введіть id нотатки" + PROMPT))
             print(notes.show_notes({id: notes.data[id]}))
             note = input("Введіть тег" + PROMPT)
             notes.add_tags(id, note)
             notes.save_to_file()
-            print("-- Тег додано --")
+            cprint("Тег додано", 'green')
         elif answer == "tagfind" or d == 'tagfind':   #поиск по тегу
             string = input("Який тег знайти" + PROMPT)
             res = notes.find_by_tag(string)
             if not len(res):
-                print("-- Співпадінь не знайдено --")
+                cprint("Співпадінь не знайдено", 'green')
             else:
                 print(notes.show_notes(res))
         elif answer == "del" or d == 'del':  #удаление заметки
             id = int(input("Введіть id нотатки" + PROMPT))
             notes.del_note(id)
             notes.save_to_file()
-            print("-- Нотатку видалено --")
+            cprint("Нотатку видалено", 'green')
         elif answer in ["exit", ""] or d == 'exit':    #выход из цикла
             notes.save_to_file()
-            print("Good bay!")
+            cprint('See you soon!', 'green')
             break    
     pass
 
