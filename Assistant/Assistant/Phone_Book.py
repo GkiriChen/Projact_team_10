@@ -511,7 +511,7 @@ def main():
         elif d == 'phones':
             print(phone_book.show_phones(args))
         elif d == 'del_phone':
-            print(del_phone(args))
+            cprint(del_phone(args), 'light_cyan')
         elif d == 'search':
             print(search(args))
         elif d == 'del_contact':
