@@ -199,7 +199,8 @@ class AddressBook(UserDict):
             x.add_row([colored(f"{i}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
         # for key, values in self.data.items():
-        #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+           
+        #    x.add_row([colored(f"{key}","blue"),colored(f"{a}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         # return x
     
 class Field:

@@ -50,7 +50,7 @@ class AddressBook(UserDict):
             return f'Контакт {args[0]} відсутній'
         for i, j in self.data.items():
             if args[0] == i:
-                return f'Контакт: {args[0]} номери: {j.phones}'
+                return f'Контакт: {args[0]} номери: {str(j.phones)[1:-1]}'
 
     def iterator(self):
         if not self.__iterator:
@@ -82,7 +82,8 @@ class AddressBook(UserDict):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
         for values in search_result:
-            x.add_row([colored(f"{values.name}","blue"),colored(f"{values.phones}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+            a = ''.join(f'{i}\n' for i in values.phones)
+            x.add_row([colored(f"{values.name}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
         
         
@@ -142,10 +143,16 @@ class AddressBook(UserDict):
                 else:
                     session2 = PromptSession(auto_suggest=AutoSuggestFromHistory(), completer=IntentCompleter([]))
                     if input == 'phones':
-                        text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
-                        new_value = session2.prompt(text)
-                        input_phone = new_value.split(' ')
-                        contact_to_change.change_phone(input_phone[0], input_phone[1])
+                        if len(contact_to_change.phones):
+                            text = f'Введіть старий і новий номер у форматі "380XXXXXXXXX" > '
+                            new_value = session2.prompt(text)
+                            input_phone = new_value.split(' ')
+                            contact_to_change.change_phone(input_phone[0], input_phone[1])
+                        else:
+                            text = f'Введіть номер телефону який хочете додати у форматі "380XXXXXXXXX" > '
+                            new_value = session2.prompt(text)
+                            input_phone = new_value.split(' ')
+                            contact_to_change.add_phone(Phone(input_phone[0]))
                     elif input == 'email':
                         text = f'Введіть новий email y форматі "first@domen.com" > '
                         new_value = session2.prompt(text)
@@ -156,6 +163,10 @@ class AddressBook(UserDict):
                         new_value = session2.prompt(text)
                         input_phone = new_value.split(' ')
                         contact_to_change.change_birthday_in(Birthday(input_phone[0]))
+                    elif input == 'address':
+                        text = f'Введіть нову адресу > '
+                        new_value = session2.prompt(text)
+                        contact_to_change.change_address_iner(Address(new_value))
                     elif input == 'name':
                         cprint('Вибачте зміна імені не доступна', 'red')
 
@@ -191,9 +202,14 @@ class AddressBook(UserDict):
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
-        for key, values in self.data.items():
-            x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        for i, values in self.data.items():            
+            a = ''.join(f'{i}\n' for i in values.phones)
+            x.add_row([colored(f"{i}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
+        
+        # for key, values in self.data.items():
+        #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        # return x
     
 class Field:
     def __init__(self, value):
