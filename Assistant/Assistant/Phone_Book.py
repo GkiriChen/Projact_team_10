@@ -68,6 +68,7 @@ class AddressBook(UserDict):
     def __next__(self):
         if self.index >= len(self.data):
             self.index = 0
+            return 'Останній контакт!'
         else:
             result = list(self.data)[self.index]
             self.index += 1
@@ -473,7 +474,7 @@ def edit_contact(args):
 
 @input_error
 def show():
-    return next(phone_book.iterator()) if True else "Останній контакт!"
+    return next(phone_book.iterator())
 
 @input_error
 def birthday_in_days(args):
