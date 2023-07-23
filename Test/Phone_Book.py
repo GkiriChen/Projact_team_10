@@ -101,11 +101,7 @@ class AddressBook(UserDict):
         return f'Контакт : {name}, створений'
 
     def delete_contact(self, contact_name):
-        """     5555
-        Deletes a contact record based on the provided contact_name.
-        If the contact is found and deleted, it returns "Contact deleted".
-        If the contact is not found, it returns "Contact not found".
-        """
+       
         contact_to_delete = self.data.get(contact_name)
         if contact_to_delete:
             del self.data[contact_name]
@@ -114,9 +110,7 @@ class AddressBook(UserDict):
             return "Контакт не знайдено"
 
     def edit_contact(self, contact_name):
-        """
-        Edit a contact.
-        """
+        
         contact_to_change = self.data.get(contact_name)
         if contact_to_change:
             list_commands = ['done']
@@ -321,7 +315,7 @@ class Record:
             if phone == old_phone:
                 self.add_phone(new_phone)
                 self.phones.remove(phone)
-                return f'Номер {del_phone} видалено.'
+                return f'Номер {phone} видалено.'
 
     def change_birthday_in(self, birthday: Birthday):
         self.birthday = birthday
@@ -355,7 +349,6 @@ class Record:
 
 
 file_name = 'Address_Book.bin'
-# commands = ['add', 'change', 'phones', 'hello', 'show_all', 'next', 'del_phone', 'del_contact', 'change_email', 'change_bd', 'edit_contact', 'search', 'help', 'change_address', 'birthday_in_days', 'exit']
 commands = ['add', 'phones', 'show_all', 'next', 'del_phone', 'del_contact', 'edit_contact', 'search', 'birthday_in_days', 'help', 'exit']
 
 def show_help():      
@@ -364,7 +357,7 @@ def show_help():
     x.field_names = [colored("Робота з адресною книгою, наразі доступні наступні команди:", 'light_blue')]
     for a, i in enumerate(commands, start=1):
         x.add_row([colored(f"{a}. {i}","blue")])
-    # x.add_row([colored("0. exit", "blue")])
+   
     return x # показуємо табличку
 
 def pack_data():
@@ -385,15 +378,12 @@ def input_error(func):
         except KeyError:
             print('Enter user name.')
         except ValueError:
-            #print('Incorrect data in input.')
             cprint('Некоректні данні', 'red')
         except IndexError:
-            #print('You entered not correct number of args')
             cprint('Введіть правильну кількість аргументів', 'red')
         except TypeError:
             print('Use commands')
         except StopIteration:
-            #print('This was last contact')
             cprint('Останній контакт!', 'blue')
     return inner
 
@@ -505,12 +495,6 @@ def main():
             cprint('Enter arguments to command', 'red')
         elif d == 'add':
             add_contact(args)
-        # elif d == 'change':
-        #     cprint(change_contact(args), 'green')
-        # elif d == 'change_email':
-        #     cprint(change_email(args), 'green')
-        # elif d == 'change_bd':
-            # cprint(change_birthday(args), 'green')
         elif d == 'phones':
             print(phone_book.show_phones(args))
         elif d == 'del_phone':

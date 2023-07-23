@@ -1,28 +1,38 @@
-
 from termcolor import colored, cprint
 from prettytable import PrettyTable
 import os
 from Assistant import Phone_Book, notes, clean
+from abc import ABC, abstractmethod
 
+class UserInterface(ABC):
+    @abstractmethod
+    def show_message(self, message, color='white'):
+        pass
 
-def input_text():
-    text = colored('Зробіть свій вибір > ', 'yellow')
-    return input(text).lower().split(' ')
-    
-def show_greeting():      
-     
-    x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
+    @abstractmethod
+    def read_input(self):
+        pass
 
+class ConsoleInterface(UserInterface):
+    def show_message(self, message, color='white'):
+        cprint(message, color)
+
+    def read_input(self):
+        text = colored('Зробіть свій вибір > ', 'yellow')
+        return input(text).lower().split(' ')
+
+def show_greeting(ui):      
+    x = PrettyTable(align='l')
     x.field_names = [colored("Вас вітає бот помічник, наразі доступні наступні модулі:", 'light_blue')]
     x.add_row([colored("1. Сортування файлів","blue")])     
     x.add_row([colored("2. Робота з адресною книгою","blue")])
     x.add_row([colored("3. Робота з нотатками","blue")])
     x.add_row([colored("0. Закінчити роботу програми","blue")])
 
-    print(x) # показуємо табличку
+    ui.show_message(str(x), 'blue')
 
-def run():    
-    os.system('cls||clear')  # чистим консоль перед виводом
+def run(ui):    
+    os.system('cls||clear')
     
     sorting = False
     addresbook = False
@@ -31,12 +41,12 @@ def run():
     while True:
         
         if not (sorting or addresbook or notes_local):
-            show_greeting()        
-            answer = input_text()
+            show_greeting(ui)        
+            answer = ui.read_input()
         
             try:
                 if int(answer[0]) == 0:
-                    cprint("Good bye!", 'blue')
+                    ui.show_message("Good bye!", 'blue')
                     break
                 if int(answer[0]) == 1:
                     sorting = True
@@ -45,22 +55,20 @@ def run():
                 if int(answer[0]) == 3:
                     notes_local = True
             except ValueError as e:
-                cprint('Введіть будь ласка число від 0 до 3', 'red')
+                ui.show_message('Введіть будь ласка число від 0 до 3', 'red')
 
-        if sorting:  #  тут виклик логіки роботи з сортувальником        
+        if sorting:
             clean.main()
             sorting = False
-            # os.system('cls||clear')  # чистим консоль
         
-        if addresbook:  #  тут виклик логіки роботи з Phone_Book 
+        if addresbook:
             Phone_Book.main()
             addresbook = False
-            os.system('cls||clear')  # чистим консоль
             
-        if notes_local: #  тут виклик логіки роботи з нотатками             
+        if notes_local:
             notes.main()          
             notes_local = False
-            os.system('cls||clear')  # чистим консоль
 
 if __name__ == '__main__':
-    run()
+    console_ui = ConsoleInterface()
+    run(console_ui)
