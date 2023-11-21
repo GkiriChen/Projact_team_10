@@ -35,14 +35,17 @@ class AddressBook(UserDict):
     def del_phone(self, args):
         if args[0] not in self.data.keys():
             return f'Контакт {args[0]} відсутній'
-        for key, values in self.data.items():
-            if args[0] == key and len(values.phones) != 0:
-                    for phone in values.phones:
-                        if Phone(args[1]).value == phone.value:
-                            values.phones.remove(phone)
-                            return f'Номер {phone} видалено!'
-                    return f'Номер {phone} незнайдено!'
-        return f'Контакт {args[0]} немає номерів!'
+        elif len(args) == 2:
+            for key, values in self.data.items():
+                if args[0] == key and len(values.phones) != 0:
+                        for phone in values.phones:
+                            if args[1] == phone.value:
+                                values.phones.remove(phone)
+                                return f'Номер {phone} видалено!'
+                        return f'Номер {args[1]} незнайдено!'
+                return f'Контакт {args[0]} немає номерів!'
+        else:
+            return "Введіть Ім'я та Телефон"
                 # return f'Контакт: {args[0]} номери: {j.phones}'
             
     def show_phones(self, args):
@@ -65,7 +68,7 @@ class AddressBook(UserDict):
     def __next__(self):
         if self.index >= len(self.data):
             self.index = 0
-            raise StopIteration
+            return 'Останній контакт!'
         else:
             result = list(self.data)[self.index]
             self.index += 1
@@ -83,11 +86,13 @@ class AddressBook(UserDict):
                         break
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
+        # for values in search_result:
+        #     a = ''.join(f'{i}\n' for i in values.phones)
+        #     x.add_row([colored(f"{values.name}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        # return x
         for values in search_result:
-            a = ''.join(f'{i}\n' for i in values.phones)
-            x.add_row([colored(f"{values.name}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+            x.add_row([colored(f"{values.name}","blue"),colored(f"{str(values.phones)[1:-1]}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         return x
-        
         
     def add_contact(self, args):
         name = args[0]
@@ -204,14 +209,14 @@ class AddressBook(UserDict):
     def show_all_cont(self):
         x = PrettyTable(align='l')    # ініціалізуєм табличку, вирівнюєм по лівому краю 
         x.field_names = [colored("Ім'я", 'light_blue'),colored("Телефон", 'light_blue'),colored("Пошта", 'light_blue'),colored("День народження", 'light_blue'),colored("Адреса", 'light_blue')]
-        for i, values in self.data.items():            
-            a = ''.join(f'{i}\n' for i in values.phones)
-            x.add_row([colored(f"{i}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
-        return x
-        
-        # for key, values in self.data.items():
-        #     x.add_row([colored(f"{key}","blue"),colored(f"{values.show_phones()}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        # for i, values in self.data.items():            
+        #     a = ''.join(f'{i}\n' for i in values.phones)
+        #     x.add_row([colored(f"{i}","blue"),colored(f"{a}","blue"), colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
         # return x
+        
+        for key, values in self.data.items():
+            x.add_row([colored(f"{key}","blue"),colored(f"{str(values.phones)[1:-1]}","blue"),colored(f"{values.email}","blue"), colored(f"{values.birthday}","blue"), colored(f"{values.address}","blue")])
+        return x
     
 class Field:
     def __init__(self, value):
@@ -251,8 +256,7 @@ class Phone(Field):
         elif value[0] == '-':
             self.__value = value[1:]
         elif  len(value) < 9 or len(value) > 12:
-            print(f"Невалідний номер: {value}, повинен містити лише 10-12 цифр.")
-            raise ValueError()
+            return f"Невалідний номер: {value}, повинен містити лише 10-12 цифр."
         else:
             self.__value = value  
     
@@ -409,7 +413,7 @@ def input_error(func):
 @input_error
 def add_contact(args):   
     global phone_book
-    cprint(phone_book.add_contact(args), 'blue')
+    return phone_book.add_contact(args) if args else "Введіть Ім'я та данні як аргументи"
     
 
 @input_error     
@@ -447,8 +451,7 @@ def change_birthday(args):
 
 @input_error
 def del_phone(args):
-    return phone_book.del_phone(args)
-    
+    return phone_book.del_phone(args) if args else "Введіть Ім'я та Телефон як аргументи"
     # record = phone_book.data.get(args[0])
     # for key in phone_book.keys():            
     #         if key == args[0]:
@@ -457,26 +460,26 @@ def del_phone(args):
 
 def search(args):
     global phone_book
-    return phone_book.search_in(args)
+    return phone_book.search_in(args) if args else "Введіть шаблон для пошуку як аргумент"
 
 @input_error
 def del_record(args):
     global phone_book
-    return phone_book.delete_contact(args[0])
+    return phone_book.delete_contact(args[0]) if args else "Введіть Ім'я як аргумент"
 
 @input_error
 def edit_contact(args):
     global phone_book
-    return phone_book.edit_contact(args[0])
+    return phone_book.edit_contact(args[0]) if args else "Введіть Ім'я як аргумент"
 
 @input_error
 def show():
-    cprint(next(phone_book.iterator()), 'green')
+    return next(phone_book.iterator())
 
 @input_error
 def birthday_in_days(args):
     global phone_book
-    return phone_book.birthday_in_days(args)
+    return phone_book.birthday_in_days(args) if args else "Введіть кількість днів як аргумент"
 
 @input_error
 def main():
@@ -509,13 +512,13 @@ def main():
         elif b == 'help' or d == 'help':
             print(show_help())
         elif b == 'next' or d == 'next':
-            show()
+            cprint(show(), 'green')
         elif d == 'birthday_in_days':
-            birthday_in_days(args)
+            cprint(birthday_in_days(args),'light_cyan' )
         elif b in commands:
             cprint('Enter arguments to command', 'red')
         elif d == 'add':
-            add_contact(args)
+            cprint(add_contact(args), 'light_cyan')
         # elif d == 'change':
         #     cprint(change_contact(args), 'green')
         # elif d == 'change_email':
@@ -523,15 +526,15 @@ def main():
         # elif d == 'change_bd':
             # cprint(change_birthday(args), 'green')
         elif d == 'phones':
-            print(phone_book.show_phones(args))
+            cprint(phone_book.show_phones(args), 'light_cyan')
         elif d == 'del_phone':
-            print(del_phone(args))
+            cprint(del_phone(args), 'light_cyan')
         elif d == 'search':
-            print(search(args))
+            cprint(search(args), 'light_cyan')
         elif d == 'del_contact':
-            cprint(del_record(args), 'green')
+            cprint(del_record(args), 'light_cyan')
         elif d == 'edit_contact':
-            edit_contact(args)
+            cprint(edit_contact(args), 'light_cyan')
         else:
             cprint('Please enter correct command. Use command "help" to see more.', 'red')
 
